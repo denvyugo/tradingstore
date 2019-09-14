@@ -281,9 +281,12 @@ class DBManager(metaclass=Singleton):
         self._session.close()
 
     def save_element(self, element):
+        """save element in database, return id of element"""
         self._session.add(element)
         self._session.commit()
+        element_id = element.id
         self.close()
+        return element_id
 
     def save_elements(self, elements):
         self._session.add_all(elements)
