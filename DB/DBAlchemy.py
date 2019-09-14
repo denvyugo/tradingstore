@@ -173,7 +173,7 @@ class DBManager(metaclass=Singleton):
         self.close()
 
     # Работа с заказом
-    def _add_orders(self, quantity, product_id, user_id,):
+    def  _add_orders(self, quantity, product_id, user_id,):
         """
         Метод заполнения заказа
         """
@@ -209,6 +209,11 @@ class DBManager(metaclass=Singleton):
         self.close()
         # конвертируем результат выборки в вид [1,3,5...]
         return utility._convert(result)
+
+    def get_order_items(self, user_id):
+        """load order items from orders by user_id"""
+        result = self._session.query(Order).filter_by(user_id=user_id).all()
+        return result
 
     def update_order_value(self, product_id, name, value):
         """ 
@@ -274,3 +279,14 @@ class DBManager(metaclass=Singleton):
     def close(self):
         """ Закрывает сесию """
         self._session.close()
+
+    def save_element(self, element):
+        self._session.add(element)
+        self._session.commit()
+        self.close()
+
+    def save_elements(self, elements):
+        self._session.add_all(elements)
+        self._session.commit()
+        self.close()
+

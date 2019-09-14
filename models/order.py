@@ -30,4 +30,4 @@ class Order(Base):
         """
         Метод возвращает формальное строковое представление указанного объекта
         """
-        return "{} {}".format(self.quantity, self.data)
+        return "Order: quantity {} on {}".format(self.quantity, self.data)

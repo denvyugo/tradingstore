@@ -1,16 +1,12 @@
 import os
 # импортируем модуль emoji для отображения эмоджи
 from emoji import emojize
-# импортируем менеджер для работы с БД
-from DB.DBAlchemy import DBManager
 
 def get_token():
-    with open('token.txt', 'r') as file:
+    with open(os.path.join(BASE_DIR, 'token.txt'), 'r') as file:
         token, bot_name = file.readline().split(sep=';')
     return token.split(sep=' = ')[1]
 
-# токен выдается при регистрации приложения
-TOKEN = get_token()
 # название БД
 NAME_DB = 'products.db'
 # версия приложения
@@ -20,8 +16,12 @@ AUTHOR = 'Zveryaka A.'
 
 # Base folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+print(BASE_DIR)
 # Path to DB
 DATABASE = os.path.join('sqlite:///'+BASE_DIR, NAME_DB)
+
+# токен выдается при регистрации приложения
+TOKEN = get_token()
 
 COUNT = 0
 
