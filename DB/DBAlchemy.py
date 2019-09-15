@@ -12,6 +12,7 @@ from DB.dbcore import Base
 from models.category import Category
 from models.product import Products
 from models.order import Order
+from models.order_info import OrderInfo
 
 
 class Singleton(type):
@@ -210,9 +211,13 @@ class DBManager(metaclass=Singleton):
         # конвертируем результат выборки в вид [1,3,5...]
         return utility._convert(result)
 
-    def get_order_items(self, user_id):
-        """load order items from orders by user_id"""
-        result = self._session.query(Order).filter_by(user_id=user_id).all()
+    def get_order(self, order_id):
+        order_info = self._session.query(Order).filter_by(id=order_id).one()
+        return order_info
+
+    def get_order_items(self, order_id):
+        """load order items from orders by order_id"""
+        result = self._session.query(Order).filter_by(order_id=order_id).all()
         return result
 
     def update_order_value(self, product_id, name, value):
@@ -276,6 +281,17 @@ class DBManager(metaclass=Singleton):
 
         return result
 
+    # Working with order info
+    def get_orders_info(self, trader_id):
+        """load order info from db by trader_id"""
+        result = self._session.query(OrderInfo).filter_by(trader_id=trader_id).all()
+        return result
+
+    def get_order_info(self, order_id):
+        order_info = self._session.query(OrderInfo).filter_by(id=order_id).one()
+        return order_info
+
+    # Working with session
     def close(self):
         """ Закрывает сесию """
         self._session.close()
@@ -290,6 +306,10 @@ class DBManager(metaclass=Singleton):
 
     def save_elements(self, elements):
         self._session.add_all(elements)
+        self._session.commit()
+        self.close()
+
+    def update_element(self):
         self._session.commit()
         self.close()
 

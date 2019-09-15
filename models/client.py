@@ -19,4 +19,4 @@ class Client(Base):
         self.user_name = user_name
 
     def __repr__(self):
-        return f'<Client: {self.__tablename__}'
+        return f'<Client: {self.id}>'

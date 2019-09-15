@@ -35,4 +35,4 @@ class OrderInfo(Base):
         self.trader_id = trader_id
 
     def __repr__(self):
-        return f'<OrderInfo: {self.__tablename__}'
+        return f'<OrderInfo: {self.id}, {self.order_date}, {self.client_id}, {self.trader_id}>'

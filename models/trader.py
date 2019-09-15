@@ -17,4 +17,4 @@ class Trader(Base):
         self.user_name = user_name
 
     def __repr__(self):
-        return f'<Trader: {self.__tablename__}'
+        return f'<Trader: {self.id}>'
