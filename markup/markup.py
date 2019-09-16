@@ -89,6 +89,15 @@ class Keyboards:
         self.markup.row(self.set_btn('<<'), self.set_btn('ORDER'))
         return self.markup
 
+    def select_role_menu(self):
+        """markup for role selection"""
+        self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
+        btn1 = KeyboardButton('Trader')
+        btn2 = KeyboardButton('Keeper')
+        btn3 = KeyboardButton('Admin')
+        self.markup.row(btn1, btn2, btn3)
+        return  self.markup
+
     def set_select_category(self,category):
         """ 
         Создает разметку инлайн кнопок в выбранной категории товара и возвращает разметку 

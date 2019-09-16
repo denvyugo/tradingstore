@@ -8,7 +8,8 @@ class Client(Base):
     __tablename__ = 'clients'
     id = Column(Integer, primary_key = True)
     address = Column(String)
-    chat_id = Column(String)
+    chat_id = Column(Integer)
+    email = Column(String)
     phone = Column(String)
     user_name = Column(String)
 

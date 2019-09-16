@@ -1,11 +1,7 @@
 import os
+from enum import IntEnum
 # импортируем модуль emoji для отображения эмоджи
 from emoji import emojize
-
-def get_token():
-    with open(os.path.join(BASE_DIR, 'token.txt'), 'r') as file:
-        token, bot_name = file.readline().split(sep=';')
-    return token.split(sep=' = ')[1]
 
 # название БД
 NAME_DB = 'products.db'
@@ -21,6 +17,11 @@ print(BASE_DIR)
 DATABASE = os.path.join('sqlite:///'+BASE_DIR, NAME_DB)
 
 # токен выдается при регистрации приложения
+def get_token():
+    with open(os.path.join(BASE_DIR, 'token.txt'), 'r') as file:
+        token, bot_name = file.readline().split(sep=';')
+    return token.split(sep=' = ')[1].replace("'", '')
+
 TOKEN = get_token()
 
 COUNT = 0
@@ -60,3 +61,10 @@ COMMANDS = {
     'START': "start",
     'HELP': "help",
 }
+
+
+# Roles of users
+class Role(IntEnum):
+    Trader = 1
+    Keeper = 2
+    Admin = 3

@@ -10,9 +10,10 @@ from settings import utility
 from DB.dbcore import Base
 
 from models.category import Category
-from models.product import Products
 from models.order import Order
 from models.order_info import OrderInfo
+from models.product import Products
+from models.user import User
 
 
 class Singleton(type):
@@ -290,6 +291,14 @@ class DBManager(metaclass=Singleton):
     def get_order_info(self, order_id):
         order_info = self._session.query(OrderInfo).filter_by(id=order_id).one()
         return order_info
+
+    # Working with user
+    def get_user(self, chat_id):
+        try:
+            user = self._session.query(User).filter_by(chat_id=chat_id).one()
+            return user
+        except:
+            pass
 
     # Working with session
     def close(self):

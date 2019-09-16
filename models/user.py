@@ -1,20 +1,18 @@
 # импортируем специальные поля Алхимии для инициализации полей таблицы
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer
 # импортируем модуль инициализации декларативного класса Алхимии
 from DB.dbcore import Base
 
 
-class Trader(Base):
-    __tablename__ = 'traders'
+class User(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key = True)
     chat_id = Column(Integer)
-    phone = Column(String)
-    user_name = Column(String)
+    role = Column(Integer)
 
-    def __init__(self, chat_id, phone, user_name):
+    def __init__(self, chat_id, role):
         self.chat_id = chat_id
-        self.phone = phone
-        self.user_name = user_name
+        self.role = role
 
     def __repr__(self):
-        return f'<Trader: {self.id}>'
+        return f'<User: {self.id}, chat = {self.chat_id}>'
