@@ -21,9 +21,8 @@ class HandlerCommands(Handler):
                               message.from_user.first_name + ', здравствуйте! Жду дальнейших задач.',
                               reply_markup=self.keybords.start_menu())
         else:
-            self.bot.send_message(message.chat.id, 'You should choose a role.')
             self.bot.send_message(message.chat.id,
-                                  message.from_user.first_name + ', здравствуйте! Жду дальнейших задач.',
+                                  message.from_user.first_name + ', здравствуйте! Укажите, пожалуйста, Вашу должность.',
                                   reply_markup=self.keybords.select_role_menu())
 
     def handle(self):

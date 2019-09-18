@@ -7,12 +7,12 @@ from DB.dbcore import Base
 class Trader(Base):
     __tablename__ = 'traders'
     id = Column(Integer, primary_key = True)
-    chat_id = Column(Integer)
+    user_id = Column(Integer)
     phone = Column(String)
     user_name = Column(String)
 
-    def __init__(self, chat_id, phone, user_name):
-        self.chat_id = chat_id
+    def __init__(self, user_id, phone, user_name):
+        self.user_id = user_id
         self.phone = phone
         self.user_name = user_name
 

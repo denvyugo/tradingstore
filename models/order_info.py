@@ -36,3 +36,6 @@ class OrderInfo(Base):
 
     def __repr__(self):
         return f'<OrderInfo: {self.id}, {self.order_date}, {self.client_id}, {self.trader_id}>'
+
+    def __str__(self):
+        return f'OderID: {self.id} of {self.order_dates} for {self.client_id}'

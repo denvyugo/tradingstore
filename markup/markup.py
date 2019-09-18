@@ -70,12 +70,13 @@ class Keyboards:
         Создает разметку кнопок в основном меню и возвращает разметку 
         """
         self.markup = ReplyKeyboardMarkup(True, True)
-        itm_btn_1 = self.set_btn('CHOOSE_GOODS')
-        itm_btn_2 = self.set_btn('INFO')
-        itm_btn_3 = self.set_btn('SETTINGS')
+        itm_btn_1 = self.set_btn('CHOOSE_ORDER')
+        itm_btn_2 = self.set_btn('CHOOSE_GOODS')
+        itm_btn_3 = self.set_btn('INFO')
+        itm_btn_4 = self.set_btn('SETTINGS')
         # рассположение кнопок в меню
-        self.markup.row(itm_btn_1)
-        self.markup.row(itm_btn_2, itm_btn_3)
+        self.markup.row(itm_btn_1, itm_btn_2)
+        self.markup.row(itm_btn_3, itm_btn_4)
         return self.markup
 
     def category_menu(self):
@@ -92,10 +93,10 @@ class Keyboards:
     def select_role_menu(self):
         """markup for role selection"""
         self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
-        btn1 = KeyboardButton('Trader')
-        btn2 = KeyboardButton('Keeper')
-        btn3 = KeyboardButton('Admin')
-        self.markup.row(btn1, btn2, btn3)
+        itm_btn_1 = self.set_btn('TRADER')
+        itm_btn_2 = self.set_btn('KEEPER')
+        itm_btn_3 = self.set_btn('ADMIN')
+        self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
         return  self.markup
 
     def set_select_category(self,category):

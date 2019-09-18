@@ -1,9 +1,11 @@
 # импортируем настройки и утилиты
-from settings import config,utility
+from settings import config, utility
 # импортируем ответ пользователю
 from settings.message import MESSAGES
 # импортируем класс родитель
 from handlers.handler import Handler
+from models.user import User
+from models.order_trading import TraderUser
 
 class HandlerAllText(Handler):
     """
@@ -199,11 +201,57 @@ class HandlerAllText(Handler):
                               parse_mode="HTML",                                          
                               reply_markup=self.keybords.orders_menu(self.step,quantity))
 
+    def _get_trader_orders(self, message):
+        """
+        get list of orders of current trader
+        :param message:
+        :return: None
+        """
+        trader_user = self._get_current_trader(message)
+        orders = trader_user.get_orders(self.BD)
+        if len(orders):
+            msg = 'List of orders: \n'
+            for order in orders:
+                msg = msg + order.__str__()
+            msg = msg + '\nChoose order id:'
+            self.bot.send_message(message.chat.id, msg)
+        else:
+            msg = 'You have no orders yet'
+            self.bot.send_message(message.chat.id, msg, reply_markup=self.keybords.start_menu())
+
+    def _add_trader(self, message):
+        """
+        add new user with role 'Trader'
+        """
+        user = User(chat_id=message.chat.id, role=config.Role.Trader)
+        trader_id = self.BD.save_element(user)
+        trader_user = TraderUser(trader_id=trader_id, user_name=message.from_user.first_name)
+        trader_user.save(self.BD)
+        self.bot.send_message(message.chat.id, 'Приятной работы', reply_markup=self.keybords.start_menu())
+
+    def _get_current_trader(self, message):
+        """
+        get current trader
+        :param message:
+        :return: TraderUser
+        """
+        return TraderUser(self.BD.get_user(message.chat.id).id, message.from_user.first_name)
+
     def handle(self):
         # обработчик(декоратор) сообщений, который обрабатывает входящие текстовые сообщения от нажатия кнопок.
         @self.bot.message_handler(func=lambda message: True)
         def handle(message):
+            # ********** меню (выбор роли)                          **********
+            if message.text == config.KEYBOARD['TRADER']:
+                self._add_trader(message)
+            if message.text == config.KEYBOARD['KEEPER']:
+                pass
+            if message.text == config.KEYBOARD['ADMIN']:
+                pass
+
             # ********** меню (выбор категории, настройки, сведения)**********
+            if message.text == config.KEYBOARD['CHOOSE_ORDER']:
+                self._get_trader_orders(message)
             if message.text == config.KEYBOARD['CHOOSE_GOODS']:
                 self.pressed_btn_category(message)
 

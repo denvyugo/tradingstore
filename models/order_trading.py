@@ -129,22 +129,24 @@ class OrderSpec:
 
 """class for Trader"""
 class TraderUser:
-    def __init__(self, trader_id):
+    def __init__(self, trader_id, user_name=''):
         self._id = trader_id
         self.order_items = OrderItems()
         self.order = OrderSpec(self._id)
+        self._name = user_name
 
     def add_item(self, product_id, quantity=1):
         self.order_items._add(order_spec=self.order,
                               product_id=product_id,
                               quantity=quantity)
 
-    def get_orders(self):
-        """get list of orders from order_info table"""
-        db = DBManager()
+    def get_orders(self, db):
+        """
+        get list of orders from order_info table
+        """
+        # db = DBManager()
         orders = db.get_orders_info(self._id)
-        for order in orders:
-            print(order)
+        return orders
 
     def load_order(self, order_id):
         """load order info by order_id"""
@@ -157,7 +159,8 @@ class TraderUser:
         if self.order.id:
             self.order_items._save()
 
-    def save(self):
-        db = DBManager()
-        trader = Trader(chat_id=1, phone='', user_name='Smith')
+    def save(self, db):
+        # db = DBManager()
+        print('trader id: ', self._id)
+        trader = Trader(user_id=self._id, phone='', user_name=self._name)
         db.save_element(trader)

@@ -12,7 +12,6 @@ AUTHOR = 'Zveryaka A.'
 
 # Base folder
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-print(BASE_DIR)
 # Path to DB
 DATABASE = os.path.join('sqlite:///'+BASE_DIR, NAME_DB)
 
@@ -28,6 +27,7 @@ COUNT = 0
 
 # Keyboard buttons
 KEYBOARD = {
+    'CHOOSE_ORDER': 'Выбрать заказ',
     'CHOOSE_GOODS': emojize(':open_file_folder: Выбрать товар'),
     'INFO': emojize(':speech_balloon: TradingStore'),
     'SETTINGS': emojize('⚙️ Настройки'),
@@ -45,8 +45,10 @@ KEYBOARD = {
     'AMOUNT_ORDERS': COUNT,
     'UP': emojize('🔼'),
     'APPLAY': '✅ Оформить заказ',
-    'COPY': '©️'
-
+    'COPY': '©️',
+    'TRADER': 'Trader',
+    'KEEPER': 'Keeper',
+    'ADMIN': 'Admin'
 }
 
 # Id ctegory to products
