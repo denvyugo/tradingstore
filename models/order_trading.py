@@ -6,6 +6,7 @@ from DB.DBAlchemy import DBManager
 from models.order import Order
 from models.order_info import OrderInfo
 from models.trader import Trader
+from settings.config import Status
 
 
 """class for order item"""
@@ -16,8 +17,7 @@ class OrderItem:
         self.product_id = product_id
         self.quantity = quantity
 
-    def save(self):
-        db = DBManager()
+    def save(self, db: DBManager):
         if self._id:
             order = db.get_order(self._id)
             order.product_id = self.product_id
@@ -43,7 +43,7 @@ class OrderItems:
 
     def _add(self, order_spec, product_id, quantity=1):
         if product_id not in self._orders:
-            order_item = OrderItem(order_spec=order_spec ,product_id=product_id, quantity=quantity)
+            order_item = OrderItem(order_spec=order_spec, product_id=product_id, quantity=quantity)
             self._orders[product_id] = order_item
         else:
             order_item = self._orders[product_id]
@@ -60,8 +60,7 @@ class OrderItems:
             sum_quantity += order_item.quantity
         return sum_quantity
 
-    def _load(self, order_spec):
-        db = DBManager()
+    def _load(self, db: DBManager, order_spec):
         products = db.get_order_items(order_spec.id)
         for order in products:
             order_item = OrderItem(order_spec=order_spec,
@@ -71,15 +70,12 @@ class OrderItems:
             order_item.order_id = order.order_id
             self._orders[order_item.product_id] = order_item
 
-    def status(self):
-        pass
-
     def delete_all(self):
         pass
 
-    def _save(self):
+    def _save(self, db: DBManager):
         for order in self._orders.values():
-            order.save()
+            order.save(db)
 
 
 """class for order info"""
@@ -87,7 +83,7 @@ class OrderSpec:
     def __init__(self, trader_id):
         self._client = 0
         self._date = None
-        self._status = 'New'
+        self._status = Status.New
         self._trader = trader_id
         self._id = 0
 
@@ -95,19 +91,24 @@ class OrderSpec:
     def id(self):
         return self._id
 
+    @id.setter
+    def id(self, order_id):
+        self._id = order_id
+
     def set_client(self, client_id):
         self._client = client_id
 
-    def load(self, order_id):
+    def status(self, status):
+        self._status = status
+
+    def load(self, db: DBManager, order_id):
         self._id = order_id
-        db = DBManager()
         order_info = db.get_order_info(order_id)
         self._client = order_info.client_id
         self._date = order_info.order_date
         self._status = order_info.status
 
-    def save(self):
-        db = DBManager()
+    def save(self, db: DBManager):
         if self._id:
             order = db.get_order_info(self._id)
             order.client_id = self._client
@@ -121,6 +122,7 @@ class OrderSpec:
 
     def _get_order_info(self):
         order_info = OrderInfo(client_id=self._client,
+                               is_current=True,
                                order_date=self._date,
                                status=self._status,
                                trader_id=self._trader)
@@ -135,32 +137,53 @@ class TraderUser:
         self.order = OrderSpec(self._id)
         self._name = user_name
 
-    def add_item(self, product_id, quantity=1):
-        self.order_items._add(order_spec=self.order,
+    @property
+    def id(self):
+        return self._id
+
+    def add_item(self, db: DBManager, product_id, quantity=1):
+        """
+        add item to order, if enough product quantity
+        :param db: link to DBManager
+        :param product_id:
+        :param quantity:
+        :return True: if enough products, False: otherwise
+        """
+        if self.order.id == 0:
+            self.order.save(db)
+        # check if product quantity enough
+        if db.decrease_product(product_id=product_id, quantity=quantity):
+            self.order_items._add(order_spec=self.order,
                               product_id=product_id,
                               quantity=quantity)
+            self.order_items._save(db)
+            return True
+        else:
+            return False
 
-    def get_orders(self, db):
+    def get_orders(self, db: DBManager):
         """
-        get list of orders from order_info table
+        get list of orders from order_info table or get only one current order
         """
-        # db = DBManager()
-        orders = db.get_orders_info(self._id)
-        return orders
+        order = db.get_order_current(trader_id=self._id)
+        if order:
+            return [order]
+        else:
+            orders = db.get_orders_info(self._id)
+            return orders
 
-    def load_order(self, order_id):
+    def load_order(self, db: DBManager, order_id):
         """load order info by order_id"""
-        self.order.load(order_id)
-        self.order_items._load(self.order)
+        self.order.load(db=db, order_id=order_id)
+        self.order_items._load(db=db, order_spec=self.order)
 
-    def save_order(self):
+    def save_order(self, db: DBManager):
         """save order items in DB if order info (OrderSpec) is presented"""
-        self.order.save()
+        self.order.save(db)
         if self.order.id:
-            self.order_items._save()
+            self.order_items._save(db)
 
     def save(self, db):
-        # db = DBManager()
         print('trader id: ', self._id)
         trader = Trader(user_id=self._id, phone='', user_name=self._name)
         db.save_element(trader)

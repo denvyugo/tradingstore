@@ -78,7 +78,7 @@ class DBManager(metaclass=Singleton):
         """ 
         Возвращает одну строку товара с номером rownum 
         """
-        result = self._session.query(Products).filter_by(id=rownum).all()
+        result = self._session.query(Products).filter_by(id=rownum).first()
         self.close()
         return result
 
@@ -86,7 +86,7 @@ class DBManager(metaclass=Singleton):
         """ 
         Возвращает название товара в соответствии с номером rownum 
         """
-        result = self._session.query(Products.name).filter_by(id=rownum).one()
+        result = self._session.query(Products.name).filter_by(id=rownum).first()
         self.close()
         return result.name
 
@@ -202,6 +202,21 @@ class DBManager(metaclass=Singleton):
         self._session.add(order)
         self._session.commit()
         self.close()
+        
+    def decrease_product(self, product_id, quantity):
+        """
+        check if quantity enough and decrease quantity of product
+        :param product_id:
+        :param quantity:
+        :return True: if quantity enough, False: otherwise
+        """
+        product = self._session.query(Products).filter_by(id=product_id).first()
+        if product.quantity >= quantity:
+            product.quantity -= quantity
+            self._session.commit()
+            return True
+        else:
+            return False
 
     def select_all_product_id(self):
         """ 
@@ -213,8 +228,21 @@ class DBManager(metaclass=Singleton):
         return utility._convert(result)
 
     def get_order(self, order_id):
-        order_info = self._session.query(Order).filter_by(id=order_id).one()
-        return order_info
+        order = self._session.query(Order).filter_by(id=order_id).first()
+        return order
+
+    def set_order_current(self, trader_id, order_id):
+        """
+        set selected trader's order to current
+        :param trader_id:
+        :param order_id:
+        :return:
+        """
+        self._session.query(OrderInfo).filter_by(trader_id=trader_id).update({OrderInfo.is_current: False})
+        self._session.commit()
+        order_info = self._session.query(OrderInfo).filter_by(id=order_id).first()
+        order_info.is_current = True
+        self.update_element()
 
     def get_order_items(self, order_id):
         """load order items from orders by order_id"""
@@ -290,6 +318,14 @@ class DBManager(metaclass=Singleton):
 
     def get_order_info(self, order_id):
         order_info = self._session.query(OrderInfo).filter_by(id=order_id).one()
+        return order_info
+
+    def get_order_status(self, trader_id, status=config.Status.New):
+        order_info = self._session.query(OrderInfo).filter_by(trader_id=trader_id, status=status).first()
+        return order_info
+
+    def get_order_current(self, trader_id):
+        order_info = self._session.query(OrderInfo).filter_by(trader_id=trader_id, is_current=True).first()
         return order_info
 
     # Working with user

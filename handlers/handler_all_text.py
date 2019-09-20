@@ -46,7 +46,7 @@ class HandlerAllText(Handler):
         обрабатывает входящие текстовые сообщения от нажатия на кнопоки каталога товаров.
         """
         self.bot.send_message(message.chat.id, 'Категория ' + config.KEYBOARD[product],
-                              reply_markup=self.keybords.set_select_category(config.CATEGORY[product]))
+                              reply_markup=self.keybords.set_select_category(message.chat.id, config.CATEGORY[product]))
         self.bot.send_message(message.chat.id, "Ок",
                               reply_markup=self.keybords.category_menu())
     
@@ -210,13 +210,10 @@ class HandlerAllText(Handler):
         trader_user = self._get_current_trader(message)
         orders = trader_user.get_orders(self.BD)
         if len(orders):
-            msg = 'List of orders: \n'
-            for order in orders:
-                msg = msg + order.__str__()
-            msg = msg + '\nChoose order id:'
-            self.bot.send_message(message.chat.id, msg)
+            msg = 'Пожалуйста, выберите заказ для работы:'
+            self.bot.send_message(message.chat.id, msg, reply_markup=self.keybords.orders_info_menu(trader_user))
         else:
-            msg = 'You have no orders yet'
+            msg = 'У Вас нет заказов для работы'
             self.bot.send_message(message.chat.id, msg, reply_markup=self.keybords.start_menu())
 
     def _add_trader(self, message):

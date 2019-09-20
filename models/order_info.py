@@ -1,5 +1,5 @@
 # импортируем специальные поля Алхимии для инициализации полей таблицы
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey
+from sqlalchemy import Column, DateTime, Boolean, Integer, ForeignKey
 # импортируем модуль для связки таблиц
 from sqlalchemy.orm import relationship, backref
 # импортируем модуль инициализации декларативного класса Алхимии
@@ -13,8 +13,9 @@ class OrderInfo(Base):
     __tablename__ = 'order_info'
     id = Column(Integer, primary_key = True)
     client_id = Column(Integer, ForeignKey('clients.id'))
+    is_current = Column(Boolean)
     order_date = Column(DateTime)
-    status = Column(String)
+    status = Column(Integer)
     trader_id = Column(Integer, ForeignKey('traders.id'))
     # используется cascade='delete,all' для каскадного удаления данных ис таблицы
     client = relationship(
@@ -28,8 +29,9 @@ class OrderInfo(Base):
                         uselist=True,
                         cascade='delete,all'))
 
-    def __init__(self, client_id, order_date, status, trader_id):
+    def __init__(self, client_id, is_current, order_date, status, trader_id):
         self.client_id = client_id
+        self.is_current = is_current
         self.order_date = order_date
         self.status = status
         self.trader_id = trader_id
@@ -38,4 +40,4 @@ class OrderInfo(Base):
         return f'<OrderInfo: {self.id}, {self.order_date}, {self.client_id}, {self.trader_id}>'
 
     def __str__(self):
-        return f'OderID: {self.id} of {self.order_dates} for {self.client_id}'
+        return f'OderID: {self.id} of {self.order_date} for {self.client_id}'

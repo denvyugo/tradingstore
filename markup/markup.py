@@ -1,9 +1,11 @@
 # импортируем специальные типы телеграм бота для создания кнопок и клавиатуры
+import json
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 # импортируем настройки и утилиты
 from settings import config,utility
 #  импортируем менеджер для работы с БД
 from DB.DBAlchemy import DBManager
+from models.order_trading import TraderUser
 
 
 class Keyboards:
@@ -32,12 +34,13 @@ class Keyboards:
 
         return KeyboardButton(config.KEYBOARD[name])
 
-    def set_inline_btn(self, name):
+    def set_inline_btn(self, name, data=''):
         """ 
         Создает и возвращает инлайн кнопку по входным параметрам 
         """
-        return InlineKeyboardButton(str(name),
-                                    callback_data=str(name.id))
+        if len(data) == 0:
+            data = str(name.id)
+        return InlineKeyboardButton(str(name), callback_data=data)
     
     def remove_menu(self):
         """ 
@@ -99,17 +102,48 @@ class Keyboards:
         self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
         return  self.markup
 
-    def set_select_category(self,category):
+    def set_select_category(self, trader_id, category):
         """ 
         Создает разметку инлайн кнопок в выбранной категории товара и возвращает разметку 
         """
         self.markup = InlineKeyboardMarkup(row_width=1)
         # загружаем в название инлайн кнопок данные с БД в соответствие с категорией товара
+        order_current = self.BD.get_order_current(trader_id=trader_id)
         for itm in self.BD.select_all_products_category(category):
-            self.markup.add(self.set_inline_btn(itm))
+            # dump a data to json string
+            # keys & values are: 'm' - menu: 'p' - products (add one product)
+            #                    't' - trader id
+            #                    'o' - current order id
+            #                    'p' - product id
+            data = json.dumps({'m': 'p',
+                               't': trader_id,
+                               'o': order_current.id,
+                               'p': itm.id},
+                              separators=(',', ':'))
+            self.markup.add(self.set_inline_btn(str(itm), data))
 
         return self.markup
-    
+
+    def orders_info_menu(self, trader_user: TraderUser):
+        """
+        create inline-menu of trader's orders
+        :param trader_user:
+        :return: markup
+        """
+        orders = trader_user.get_orders(self.BD)
+        self.markup = InlineKeyboardMarkup(row_width=1)
+        if len(orders):
+            for order in orders:
+                # dump a data to json string
+                # keys & values are: 'm' - menu: 'o' - orders (choose one order to work with)
+                #                    't' - trader id
+                #                    'o' - current order id
+                data = json.dumps({'m': 'o',
+                                   't': trader_user.id,
+                                   'o': order.id},
+                                  separators=(',', ':'))
+                self.markup.add(self.set_inline_btn(str(order), data))
+
     def orders_menu(self,step,quantity):
         """ 
         Создает разметку кнопок в заказе товара и возвращает разметку 

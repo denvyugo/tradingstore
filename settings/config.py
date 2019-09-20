@@ -70,3 +70,13 @@ class Role(IntEnum):
     Trader = 1
     Keeper = 2
     Admin = 3
+
+
+# Order's Status
+class Status(IntEnum):
+    New = 0
+    Work = 1
+    Complete = 2
+    Done = 3
+    Cancel = 4
+    Canceled = 5
