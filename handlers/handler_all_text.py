@@ -45,8 +45,10 @@ class HandlerAllText(Handler):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопоки каталога товаров.
         """
+        trader_user = self._get_current_trader(message)
         self.bot.send_message(message.chat.id, 'Категория ' + config.KEYBOARD[product],
-                              reply_markup=self.keybords.set_select_category(message.chat.id, config.CATEGORY[product]))
+                              reply_markup=self.keybords.set_select_category(trader_id=trader_user.id,
+                                                                             category=config.CATEGORY[product]))
         self.bot.send_message(message.chat.id, "Ок",
                               reply_markup=self.keybords.category_menu())
     
@@ -70,7 +72,7 @@ class HandlerAllText(Handler):
 
         # отправляем ответ пользователю
         self.send_message_order(count[self.step],quantity,message)
-    
+
     def pressed_btn_back_step(self, message):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопку back_step.
@@ -232,7 +234,8 @@ class HandlerAllText(Handler):
         :param message:
         :return: TraderUser
         """
-        return TraderUser(self.BD.get_user(message.chat.id).id, message.from_user.first_name)
+        user = self.BD.get_user(chat_id=message.chat.id)
+        return TraderUser(user.id, message.from_user.first_name)
 
     def handle(self):
         # обработчик(декоратор) сообщений, который обрабатывает входящие текстовые сообщения от нажатия кнопок.

@@ -14,6 +14,17 @@ class HandlerInlineQuery(Handler):
     def __init__(self, bot):
         super().__init__(bot)
 
+    def _get_trader(self, trader_id):
+        """
+        enter in current order and display form for work with it
+        :param trader_id:
+        :return TraderUser:
+        """
+        trader_user = TraderUser(trader_id=trader_id)
+        order_id = self.BD.get_order_current(trader_id=trader_id)
+        trader_user.load_order(db=self.BD, order_id=order_id.id)
+        return trader_user
+
     def pressed_btn_product(self, call, code):
         """
         обрабатывает входящие запросы на нажатие кнопок товара inline
@@ -41,6 +52,9 @@ class HandlerInlineQuery(Handler):
         :return: None
         """
         self.BD.set_order_current(trader_id=code['t'], order_id=code['o'])
+        trader = self._get_trader(trader_id=code['t'])
+        msg = 'Выбран заказ №{}, можете продолжить работу с заказом или выбрать другой'.format(code['o'])
+        self.bot.send_message(trader.chat_id, msg, reply_markup=self.keybords.start_menu())
 
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.

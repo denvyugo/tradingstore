@@ -82,6 +82,18 @@ class Keyboards:
         self.markup.row(itm_btn_3, itm_btn_4)
         return self.markup
 
+    def current_order_menu(self):
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn_1 = self.set_btn('CHOOSE_ORDER')
+        itm_btn_2 = self.set_btn('ORDER')
+        itm_btn_3 = self.set_btn('CHOOSE_GOODS')
+        itm_btn_4 = self.set_btn('INFO')
+        itm_btn_5 = self.set_btn('SETTINGS')
+        # рассположение кнопок в меню
+        self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
+        self.markup.row(itm_btn_4, itm_btn_5)
+        return self.markup
+
     def category_menu(self):
         """ 
         Создает разметку кнопок в меню категорий товара и возвращает разметку 
@@ -100,7 +112,7 @@ class Keyboards:
         itm_btn_2 = self.set_btn('KEEPER')
         itm_btn_3 = self.set_btn('ADMIN')
         self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
-        return  self.markup
+        return self.markup
 
     def set_select_category(self, trader_id, category):
         """ 
@@ -121,7 +133,6 @@ class Keyboards:
                                'p': itm.id},
                               separators=(',', ':'))
             self.markup.add(self.set_inline_btn(str(itm), data))
-
         return self.markup
 
     def orders_info_menu(self, trader_user: TraderUser):
@@ -143,6 +154,7 @@ class Keyboards:
                                    'o': order.id},
                                   separators=(',', ':'))
                 self.markup.add(self.set_inline_btn(str(order), data))
+            return self.markup
 
     def orders_menu(self,step,quantity):
         """ 

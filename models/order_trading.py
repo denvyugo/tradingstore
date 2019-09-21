@@ -136,10 +136,15 @@ class TraderUser:
         self.order_items = OrderItems()
         self.order = OrderSpec(self._id)
         self._name = user_name
+        self._chat_id = 0
 
     @property
     def id(self):
         return self._id
+
+    @property
+    def chat_id(self):
+        return self._chat_id
 
     def add_item(self, db: DBManager, product_id, quantity=1):
         """
@@ -173,7 +178,10 @@ class TraderUser:
             return orders
 
     def load_order(self, db: DBManager, order_id):
-        """load order info by order_id"""
+        """
+        load order info by order_id
+        """
+        self._load(db=db)
         self.order.load(db=db, order_id=order_id)
         self.order_items._load(db=db, order_spec=self.order)
 
@@ -187,3 +195,8 @@ class TraderUser:
         print('trader id: ', self._id)
         trader = Trader(user_id=self._id, phone='', user_name=self._name)
         db.save_element(trader)
+
+    def _load(self, db: DBManager):
+        user = db.get_user_id(self._id)
+        if user:
+            self._chat_id = user.chat_id
