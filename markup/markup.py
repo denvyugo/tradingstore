@@ -23,7 +23,7 @@ class Keyboards:
         Создает и возвращает кнопку по входным параметрам 
         """
         if name == "AMOUNT_ORDERS":
-            config.KEYBOARD["AMOUNT_ORDERS"] = "{} {} {}".format(step+1,' из ',str(self.BD.count_rows_order()))
+            config.KEYBOARD["AMOUNT_ORDERS"] = step
         
         if name == "AMOUNT_PRODUCT":
             config.KEYBOARD["AMOUNT_PRODUCT"] = "{}".format(quantity)
@@ -83,15 +83,18 @@ class Keyboards:
         return self.markup
 
     def current_order_menu(self):
+        """
+        making markup for work with order
+        :return:
+        """
         self.markup = ReplyKeyboardMarkup(True, True)
         itm_btn_1 = self.set_btn('CHOOSE_ORDER')
-        itm_btn_2 = self.set_btn('ORDER')
-        itm_btn_3 = self.set_btn('CHOOSE_GOODS')
-        itm_btn_4 = self.set_btn('INFO')
-        itm_btn_5 = self.set_btn('SETTINGS')
+        itm_btn_2 = self.set_btn('CHOOSE_GOODS')
+        itm_btn_3 = self.set_btn('<<')
+        itm_btn_4 = self.set_btn('ORDER')
         # рассположение кнопок в меню
-        self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
-        self.markup.row(itm_btn_4, itm_btn_5)
+        self.markup.row(itm_btn_1, itm_btn_2)
+        self.markup.row(itm_btn_3, itm_btn_4)
         return self.markup
 
     def category_menu(self):
@@ -106,7 +109,9 @@ class Keyboards:
         return self.markup
 
     def select_role_menu(self):
-        """markup for role selection"""
+        """
+        markup for role selection
+        """
         self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
         itm_btn_1 = self.set_btn('TRADER')
         itm_btn_2 = self.set_btn('KEEPER')
@@ -156,7 +161,7 @@ class Keyboards:
                 self.markup.add(self.set_inline_btn(str(order), data))
             return self.markup
 
-    def orders_menu(self,step,quantity):
+    def orders_menu(self, step, quantity):
         """ 
         Создает разметку кнопок в заказе товара и возвращает разметку 
         """

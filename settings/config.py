@@ -15,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Path to DB
 DATABASE = os.path.join('sqlite:///'+BASE_DIR, NAME_DB)
 
-# токен выдается при регистрации приложения
+# токен выдается при регистрации приложения, храним в текстовом файле
 def get_token():
     with open(os.path.join(BASE_DIR, 'token.txt'), 'r') as file:
         token, bot_name = file.readline().split(sep=';')

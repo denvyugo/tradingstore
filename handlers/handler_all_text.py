@@ -58,49 +58,61 @@ class HandlerAllText(Handler):
         """
         self.bot.send_message(message.chat.id, "Вы вернулись назад",
                               reply_markup=self.keybords.start_menu())
-    
+
+    # -------------------------- working with order form --------------------------------------
     def pressed_btn_order(self, message):
         """
-        обрабатывает входящие текстовые сообщения от нажатия на кнопку order.
+        обрабатывает входящие текстовые сообщения от нажатия на кнопку order - start work with it
         """
-        # обнуляем данные шага
-        self.step = 0
-        # получаем список всех товаров в заказе
-        count = self.BD.select_all_product_id()
-        # получаем количество в каждой позиции товара в заказе
-        quantity = self.BD.select_order_quantity(count[self.step])
-
-        # отправляем ответ пользователю
-        self.send_message_order(count[self.step],quantity,message)
+        trader_user = self._get_current_trader(message)
+        trader_user.load_current(db=self.BD)
+        if trader_user.order_items.number_positions > 0:
+            # current order has a order positions
+            # get current order item, set current first if there is no current order
+            order_item = trader_user.order_items.current_get(db=self.BD)
+            # send the message - fill the form
+            self.send_message_order(message, order_item, trader_user.order_items.number_positions)
+        else:
+            # current order has not a positions
+            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                  parse_mode="HTML",
+                                  reply_markup=self.keybords.category_menu())
 
     def pressed_btn_back_step(self, message):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопку back_step.
         """
-        # уменьшаем шаг пока шаг не будет равет "0"
-        if self.step > 0:
-            self.step -=1
-        # получаем список всех товаров в заказе
-        count = self.BD.select_all_product_id()
-        quantity = self.BD.select_order_quantity(count[self.step])
-
-        # отправляем ответ пользователю
-        self.send_message_order(count[self.step],quantity,message)
+        trader_user = self._get_current_trader(message)
+        trader_user.load_current(db=self.BD)
+        if trader_user.order_items.number_positions > 0:
+            # current order has a order positions
+            # get previous order item
+            order_item = trader_user.order_items.current_prev(db=self.BD)
+            # send the message - fill the form
+            self.send_message_order(message, order_item, trader_user.order_items.number_positions)
+        else:
+            # current order has not a positions
+            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                  parse_mode="HTML",
+                                  reply_markup=self.keybords.category_menu())
     
     def pressed_btn_next_step(self, message):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопку next_step.
         """
-        # увеличиваем шаг пока шаг не будет равет количеству строк полей заказа с расчетом цены деления начиная с "0"
-        if self.step < self.BD.count_rows_order()-1:
-            self.step +=1
-        # получаем список всех товаров в заказе
-        count = self.BD.select_all_product_id()
-        # получаем еоличество конкретного товара в соответствие с шагом выборки 
-        quantity = self.BD.select_order_quantity(count[self.step])
-
-        # отправляем ответ пользователю
-        self.send_message_order(count[self.step],quantity,message)
+        trader_user = self._get_current_trader(message)
+        trader_user.load_current(db=self.BD)
+        if trader_user.order_items.number_positions > 0:
+            # current order has a order positions
+            # get next order item
+            order_item = trader_user.order_items.current_next(db=self.BD)
+            # send the message - fill the form
+            self.send_message_order(message, order_item, trader_user.order_items.number_positions)
+        else:
+            # current order has not a positions
+            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                  parse_mode="HTML",
+                                  reply_markup=self.keybords.category_menu())
 
     def pressed_btn_douwn(self, message):
         """
@@ -190,18 +202,22 @@ class HandlerAllText(Handler):
         # отчищаем данные с заказа
         self.BD.delete_all_order()
 
-    def send_message_order(self,product_id,quantity,message):
+    def send_message_order(self, message, order_item, number_items):
         """
-        отправляет ответ пользователю при выполнении различных действий
+        отправляет ответ пользователю при выполнении различных действий - fill the order form
         """
-        self.bot.send_message(message.chat.id,MESSAGES['order_number'].format(self.step+1),parse_mode="HTML") 
+        product = self.BD.select_single_product(order_item.product_id)
+        step = '{} из {}'.format(order_item.number, number_items)
+        self.bot.send_message(message.chat.id,MESSAGES['order_number'].format(order_item.number), parse_mode="HTML")
         self.bot.send_message(message.chat.id,
-                              MESSAGES['order'].format(self.BD.select_single_product_name(product_id),
-                                                                        self.BD.select_single_product_title(product_id),
-                                                                        self.BD.select_single_product_price(product_id),
-                                                                        self.BD.select_order_quantity(product_id)),
+                              MESSAGES['order'].format(product.name,
+                                                       product.title,
+                                                       product.price,
+                                                       order_item.quantity),
                               parse_mode="HTML",                                          
-                              reply_markup=self.keybords.orders_menu(self.step,quantity))
+                              reply_markup=self.keybords.orders_menu(step=step, quantity=order_item.quantity))
+
+    # -------------------------- end of working with order form --------------------------------------
 
     def _get_trader_orders(self, message):
         """
@@ -272,13 +288,14 @@ class HandlerAllText(Handler):
                 self.pressed_btn_product(message,'ICE_CREAM')
             
             if message.text == config.KEYBOARD['ORDER']:
+                self.pressed_btn_order(message)
                 # если есть заказ
-                if self.BD.count_rows_order() > 0:
-                    self.pressed_btn_order(message)
-                else:
-                    self.bot.send_message(message.chat.id,MESSAGES['no_orders'],
-                                          parse_mode="HTML",
-                                          reply_markup=self.keybords.category_menu())
+                # if self.BD.count_rows_order() > 0:
+                #     self.pressed_btn_order(message)
+                # else:
+                #     self.bot.send_message(message.chat.id,MESSAGES['no_orders'],
+                #                           parse_mode="HTML",
+                #                           reply_markup=self.keybords.category_menu())
 
             if message.text == config.KEYBOARD['<<']:
                 self.pressed_btn_back(message)

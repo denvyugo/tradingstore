@@ -21,8 +21,7 @@ class HandlerInlineQuery(Handler):
         :return TraderUser:
         """
         trader_user = TraderUser(trader_id=trader_id)
-        order_id = self.BD.get_order_current(trader_id=trader_id)
-        trader_user.load_order(db=self.BD, order_id=order_id.id)
+        trader_user.load_current(db=self.BD)
         return trader_user
 
     def pressed_btn_product(self, call, code):
@@ -54,7 +53,7 @@ class HandlerInlineQuery(Handler):
         self.BD.set_order_current(trader_id=code['t'], order_id=code['o'])
         trader = self._get_trader(trader_id=code['t'])
         msg = 'Выбран заказ №{}, можете продолжить работу с заказом или выбрать другой'.format(code['o'])
-        self.bot.send_message(trader.chat_id, msg, reply_markup=self.keybords.start_menu())
+        self.bot.send_message(trader.chat_id, msg, reply_markup=self.keybords.current_order_menu())
 
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.

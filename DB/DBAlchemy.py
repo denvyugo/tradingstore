@@ -255,7 +255,7 @@ class DBManager(metaclass=Singleton):
         load order items from orders by order_id
         """
         session = self.__session()
-        result = session.query(Order).filter_by(order_id=order_id).all()
+        result = session.query(Order).filter_by(order_id=order_id).order_by(Order.id).all()
         session.close()
         return result
 
@@ -411,8 +411,3 @@ class DBManager(metaclass=Singleton):
         session.add_all(elements)
         session.commit()
         session.close()
-
-    def update_element(self):
-        self._session.commit()
-        self.close()
-

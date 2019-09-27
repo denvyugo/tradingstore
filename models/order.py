@@ -1,5 +1,5 @@
 # импортируем специальные поля Алхимии для инициализации полей таблицы
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Boolean, Integer, ForeignKey
 # импортируем модуль для связки таблиц
 from sqlalchemy.orm import relationship, backref
 # импортируем модуль инициализации декларативного класса Алхимии 
@@ -16,6 +16,7 @@ class Order(Base):
     # Инициализация полей таблицы
     __tablename__ = 'orders'
     id = Column(Integer, primary_key=True)
+    is_current = Column(Boolean)
     order_id = Column(Integer, ForeignKey('order_info.id'))
     product_id = Column(Integer, ForeignKey('products.id'))
     quantity = Column(Integer)
@@ -30,6 +31,12 @@ class Order(Base):
         backref=backref('orders',
                         uselist=True,
                         cascade='delete,all'))
+
+    def __init__(self, is_current, order_id, product_id, quantity):
+        self.is_current = is_current
+        self.order_id = order_id
+        self.product_id = product_id
+        self.quantity = quantity
 
     def __repr__(self):
         """
