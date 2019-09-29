@@ -12,13 +12,21 @@ from settings.config import Status
 
 """class for order item"""
 class OrderItem:
-    def __init__(self, order_spec, number, is_current, product_id, quantity=1, item_id=0):
+    def __init__(self, order_spec, number, product_id, quantity=1, is_current=False, item_id=0):
         self._id = item_id
         self._order_spec = order_spec
         self.number = number
         self.is_current = is_current
-        self.product_id = product_id
-        self.quantity = quantity
+        self._product_id = product_id
+        self._quantity = quantity
+
+    @property
+    def product_id(self):
+        return self._product_id
+
+    @property
+    def quantity(self):
+        return self._quantity
 
     def save(self, db: DBManager):
         if self._id:
@@ -29,6 +37,11 @@ class OrderItem:
             db.save_element(order)
         else:
             db.save_element(self.get_order())
+
+    def delete(self, db: DBManager):
+        if self._id:
+            order = db.get_order(self._id)
+            db.delete_element(order)
 
     def get_order(self):
         order = Order(order_id=self._order_spec.id,
@@ -59,7 +72,42 @@ class OrderItems:
             self._orders[product_id] = order_item
         else:
             order_item = self._orders[product_id]
-            order_item.quantity += quantity
+            order_item._quantity += quantity
+
+    def _dec(self, product_id, quantity=1):
+        """
+        check possibility of decrease number of item
+        :param product_id:
+        :param quantity:
+        :return True: if possible to decrease, False: otherwise
+        """
+        if product_id in self._orders:
+            order_item = self._orders[product_id]
+            if order_item.quantity > quantity:
+                order_item._quantity -= quantity
+                return True
+            else:
+                return False
+
+    def _del(self, db: DBManager, order_spec, product_id):
+        """
+        delete order item position
+        :param db:
+        :param product_id:
+        :return:
+        """
+        if product_id in self._orders:
+            order_item = self._orders[product_id]
+            numbers = self.number_positions
+            if db.increase_product(product_id=product_id, quantity=order_item.quantity):
+                if numbers > 1:
+                    if 1 < order_item.number < numbers or order_item.number == numbers:
+                        self.current_prev(db)
+                    elif order_item.number == 1:
+                        self.current_next(db)
+                order_item.delete(db)
+                self._orders = OrderedDict()
+                self._load(db=db, order_spec=order_spec)
 
     @property
     def number_positions(self):
@@ -71,6 +119,13 @@ class OrderItems:
         for order_item in self._orders.values():
             sum_quantity += order_item.quantity
         return sum_quantity
+
+    def total_price(self, db: DBManager):
+        price = 0
+        for order_item in self._orders.values():
+            product = db.select_single_product(rownum=order_item.product_id)
+            price += product.price * order_item.quantity
+        return round(price, 2)
 
     def current_get(self, db: DBManager):
         """
@@ -92,7 +147,7 @@ class OrderItems:
         """
         make the next current order if present
         :param db:
-        :return order: if it possible get next position, None: otherwise
+        :return order: if it possible get next position, current position: otherwise
         """
         product_id = list(reversed(self._orders.keys()))[0]
         order = self._orders[product_id]
@@ -110,13 +165,13 @@ class OrderItems:
             if next_current:
                 return order
         else:
-            return None
+            return self._orders[product_id]
 
     def current_prev(self, db: DBManager):
         """
         make the previous current order if present
         :param db:
-        :return order: if it possible get previous position, None: otherwise
+        :return order: if it possible get previous position, current position: otherwise
         """
         product_id = list(self._orders.keys())[0]
         order = self._orders[product_id]
@@ -134,7 +189,7 @@ class OrderItems:
             if prev_current:
                 return order
         else:
-            return None
+            return self._orders[product_id]
 
     def _load(self, db: DBManager, order_spec):
         products = db.get_order_items(order_spec.id)
@@ -245,6 +300,30 @@ class TraderUser:
             return True
         else:
             return False
+
+    def dec_item(self, db: DBManager, product_id, quantity=1):
+        """
+        decrease number of order item
+        :param db: link to DBManager
+        :param product_id:
+        :param quantity:
+        :return:
+        """
+        if self.order.id > 0:
+            # return quantity of product to store
+            if self.order_items._dec(product_id=product_id, quantity=quantity):
+                if db.increase_product(product_id=product_id, quantity=quantity):
+                    self.order_items._save(db)
+
+    def del_item(self, db: DBManager, product_id):
+        """
+        delete order item from order
+        :param db:
+        :param product_id:
+        :return:
+        """
+        if self.order.id > 0:
+            self.order_items._del(db=db, order_spec=self.order, product_id=product_id)
 
     def get_orders(self, db: DBManager):
         """

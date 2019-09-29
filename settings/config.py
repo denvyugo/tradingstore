@@ -40,7 +40,7 @@ KEYBOARD = {
     'NEXT_STEP': emojize('▶️'),
     'ORDER': emojize('✅ ЗАКАЗ'),
     'X': emojize('❌'),
-    'DOUWN': emojize('🔽'),
+    'DOWN': emojize('🔽'),
     'AMOUNT_PRODUCT': COUNT,
     'AMOUNT_ORDERS': COUNT,
     'UP': emojize('🔼'),

@@ -234,6 +234,24 @@ class DBManager(metaclass=Singleton):
             session.close()
             return False
 
+    def increase_product(self, product_id, quantity):
+        """
+        increase quantity of product - return to store from order
+        :param product_id:
+        :param quantity:
+        :return:
+        """
+        session = self.__session()
+        product = session.query(Products).filter_by(id=product_id).first()
+        try:
+            product.quantity += quantity
+            session.commit()
+            session.close()
+            return True
+        except Exception as e:
+            session.close()
+            return False
+
     def select_all_product_id(self):
         """ 
         Возвращает все id товара в заказе
@@ -405,6 +423,16 @@ class DBManager(metaclass=Singleton):
         element_id = element.id
         session.close()
         return element_id
+
+    def delete_element(self, element):
+        """
+        delete an element from Database
+        :param element:
+        :return:
+        """
+        session = self.__session()
+        session.delete(element)
+        session.commit()
 
     def save_elements(self, elements):
         session = self.__session()

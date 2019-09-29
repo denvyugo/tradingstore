@@ -52,7 +52,7 @@ settings = """
     KEYBOARD['<<'],
     KEYBOARD['>>'],
     KEYBOARD['UP'],
-    KEYBOARD['DOUWN'],
+    KEYBOARD['DOWN'],
     KEYBOARD['NEXT_STEP'],
     KEYBOARD['BACK_STEP'],
     KEYBOARD['X'],
