@@ -191,6 +191,16 @@ class OrderItems:
         else:
             return self._orders[product_id]
 
+    def current_clear(self, db: DBManager):
+        """
+        clear is_current status for each order item
+        :param db:
+        :return:
+        """
+        for order in self._orders.values():
+            order.is_current = False
+            order.save(db)
+
     def _load(self, db: DBManager, order_spec):
         products = db.get_order_items(order_spec.id)
         number = 0
@@ -218,6 +228,7 @@ class OrderSpec:
     def __init__(self, trader_id):
         self._client = 0
         self._date = None
+        self._current = True
         self._status = Status.New
         self._trader = trader_id
         self._id = 0
@@ -234,18 +245,23 @@ class OrderSpec:
         self._client = client_id
 
     def status(self, status):
+        if status != 0:
+            print('STATUS:', status)
+            self._current = False
         self._status = status
 
     def load(self, db: DBManager, order_id):
         self._id = order_id
         order_info = db.get_order_info(order_id)
         self._client = order_info.client_id
+        self._current = order_info.is_current
         self._date = order_info.order_date
         self._status = order_info.status
 
     def save(self, db: DBManager):
         if self._id:
             order = db.get_order_info(self._id)
+            order.is_current = self._current
             order.client_id = self._client
             order.order_date = self._date
             order.status = self._status
@@ -257,7 +273,7 @@ class OrderSpec:
 
     def _get_order_info(self):
         order_info = OrderInfo(client_id=self._client,
-                               is_current=True,
+                               is_current=self._current,
                                order_date=self._date,
                                status=self._status,
                                trader_id=self._trader)

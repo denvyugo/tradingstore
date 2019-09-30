@@ -124,21 +124,9 @@ class HandlerAllText(Handler):
         # получаем список всех товаров в заказе
         trader_user = self._get_current_trader(message)
         trader_user.load_current(db=self.BD)
-        # count = self.BD.select_all_product_id()
         # получаем количество конкретной позиции в заказе
-        # quantity_order = self.BD.select_order_quantity(count[self.step])
         order_item = trader_user.order_items.current_get(db=self.BD)
         trader_user.dec_item(db=self.BD, product_id=order_item.product_id)
-        # получаем количество конкретной позиции в пролуктов
-        # quantity_product =self.BD.select_single_product_quantity(count[self.step])
-        # если товар в заказе есть
-        # if quantity_order > 0:
-        #     quantity_order -=1
-        #     quantity_product +=1
-        #     # вносим изменения в БД orders
-        #     self.BD.update_order_value(count[self.step],'quantity',quantity_order)
-        #     # вносим изменения в БД product
-        #     self.BD.update_product_value(count[self.step],'quantity',quantity_product)
         # отправляем ответ пользователю
         self.send_message_order(message, order_item, trader_user)
     
@@ -149,21 +137,9 @@ class HandlerAllText(Handler):
         # получаем список всех товаров в заказе
         trader_user = self._get_current_trader(message)
         trader_user.load_current(db=self.BD)
-        # count = self.BD.select_all_product_id()
         # получаем количество конкретной позиции в заказе
-        # quantity_order = self.BD.select_order_quantity(count[self.step])
-        # получаем количество конкретной позиции в пролуктов
         order_item = trader_user.order_items.current_get(db=self.BD)
         trader_user.add_item(db=self.BD, product_id=order_item.product_id)
-        # quantity_product =self.BD.select_single_product_quantity(count[self.step])
-        # # если товар есть
-        # if quantity_product > 0:
-        #     quantity_order +=1
-        #     quantity_product -=1
-        #     # вносим изменения в БД orders
-        #     self.BD.update_order_value(count[self.step],'quantity',quantity_order)
-        #     # вносим изменения в БД product
-        #     self.BD.update_product_value(count[self.step],'quantity',quantity_product)
         # отправляем ответ пользователю
         self.send_message_order(message, order_item, trader_user)
 
@@ -178,25 +154,9 @@ class HandlerAllText(Handler):
         # если список не пуст
         order_item = trader_user.order_items.current_get(db=self.BD)
         trader_user.del_item(db=self.BD, product_id=order_item.product_id)
-        # if count.__len__() > 0:
-        #     # получаем количество конкретной позиции в заказе
-        #     quantity_order = self.BD.select_order_quantity(count[self.step])
-        #     # получаем количество товара к конкретной позиции заказа для возврата в product
-        #     quantity_product =self.BD.select_single_product_quantity(count[self.step])
-        #     quantity_product += quantity_order
-        #     # вносим изменения в БД orders
-        #     self.BD.delete_order(count[self.step])
-        #     # вносим изменения в БД product
-        #     self.BD.update_product_value(count[self.step],'quantity',quantity_product)
-        #     # уменьшаем шаг
-        #     self.step -= 1
-        # count = self.BD.select_all_product_id()
         # если список не пуст
-        # if count.__len__() > 0:
         if trader_user.order_items.number_positions > 0:
-            # quantity_order = self.BD.select_order_quantity(count[self.step])
-            # # отправляем пользователю сообщение
-            # self.send_message_order(count[self.step],quantity_order,message)
+            # отправляем пользователю сообщение
             order_item = trader_user.order_items.current_get(db=self.BD)
             # send the message - fill the form
             self.send_message_order(message, order_item, trader_user)
@@ -206,24 +166,35 @@ class HandlerAllText(Handler):
                                   parse_mode="HTML",
                                   reply_markup=self.keybords.category_menu())
     
-    def pressed_btn_apllay(self, message):
+    def pressed_btn_apply(self, message):
         """
-        обрабатывает входящие текстовые сообщения от нажатия на кнопку apllay.
+        обрабатывает входящие текстовые сообщения от нажатия на кнопку apply.
         """
-        # отправляем ответ пользователю
-        self.bot.send_message(message.chat.id, MESSAGES['applay'].format(utility.get_total_coas(self.BD),
-                                                                         utility.get_total_quantity(self.BD)),
-                              parse_mode="HTML",
-                              reply_markup=self.keybords.category_menu())
-        # отчищаем данные с заказа
-        self.BD.delete_all_order()
+        trader_user = self._get_current_trader(message)
+        trader_user.load_current(db=self.BD)
+        # if has order items
+        if trader_user.order_items.number_positions > 0:
+            trader_user.order.status(status=config.Status.Work)
+            trader_user.order.save(self.BD)
+            trader_user.order_items.current_clear(self.BD)
+            # отправляем ответ пользователю
+            self.bot.send_message(message.chat.id,
+                                  MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
+                                                           trader_user.order_items.number_items),
+                                  parse_mode="HTML", reply_markup=self.keybords.category_menu())
+        else:
+            # если товара нет в заказе отправляем сообщение
+            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                  parse_mode="HTML",
+                                  reply_markup=self.keybords.category_menu())
+        # # отчищаем данные с заказа
+        # self.BD.delete_all_order()
 
     def send_message_order(self, message, order_item, trader_user):
         """
         отправляет ответ пользователю при выполнении различных действий - fill the order form
         """
         product = self.BD.select_single_product(order_item.product_id)
-        # step = '{} из {}'.format(order_item.number, number_items)
         step = {'number': order_item.number,
                 'quantity': order_item.quantity,
                 'positions': trader_user.order_items.number_positions,
@@ -337,8 +308,8 @@ class HandlerAllText(Handler):
             if message.text == config.KEYBOARD['X']:
                 self.pressed_btn_x(message)
 
-            if message.text == config.KEYBOARD['APPLAY']:
-                self.pressed_btn_apllay(message)
+            if message.text == config.KEYBOARD['APPLY']:
+                self.pressed_btn_apply(message)
             # иные нажатия и ввод данных пользователем
             else:
                 self.bot.send_message(message.chat.id, message.text)

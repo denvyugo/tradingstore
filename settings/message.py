@@ -57,7 +57,7 @@ settings = """
     KEYBOARD['BACK_STEP'],
     KEYBOARD['X'],
     KEYBOARD['ORDER'],
-    KEYBOARD['APPLAY'],
+    KEYBOARD['APPLY'],
     VERSION,
     AUTHOR,
     KEYBOARD['COPY'],
@@ -68,7 +68,7 @@ product_order = """
 
 {}
 {}
-Cтоимость: {} руб
+Стоимость: {} руб
 
 добавлен в заказ!!!
 
@@ -81,7 +81,7 @@ order = """
 
 <i>Описание:</i> <b>{}</b>
 
-<i>Cтоимость:</i> <b>{} руб за 1 ед.</b>
+<i>Стоимость:</i> <b>{} руб за 1 ед.</b>
 
 <i>Количество позиций:</i> <b>{} ед.</b> 
 """
@@ -95,13 +95,13 @@ order_number = """
 no_orders = """
 <b>Заказ отсутствует !!!</b>
 """
-# ответ пользователю при почещении applay
-applay = """
+# ответ пользователю при почещении apply
+apply = """
 <b>Ваш заказ оформлен !!!</b>
 
 <i>Общая стоимость заказа составляет:</i> <b>{} руб</b>
 
-<i>Общее количнсктво пзиций составляет:</i> <b>{} ед.</b>
+<i>Общее количество позиций составляет:</i> <b>{} ед.</b>
 
 <b>ЗАКАЗ НАПРАВЛЕН НА СКЛАД,
 ДЛЯ ЕГО КОМПЛЕКТОВКИ !!!</b>
@@ -113,6 +113,6 @@ MESSAGES = {
     'order': order,
     'order_number': order_number,
     'no_orders': no_orders,
-    'applay': applay,
+    'apply': apply,
     'settings': settings
 }

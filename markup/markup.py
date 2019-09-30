@@ -28,9 +28,9 @@ class Keyboards:
         if name == "AMOUNT_PRODUCT":
             config.KEYBOARD["AMOUNT_PRODUCT"] = "{}".format(quantity)
         
-        if name == "APPLAY":
+        if name == "APPLY":
             # создает кнопку оформить с данными о стоимости товара округленного до 2 - го знака после запятой
-            config.KEYBOARD["APPLAY"] = "{}({}) руб".format('✅ Оформить', step)
+            config.KEYBOARD["APPLY"] = "{}({}) руб".format('✅ Оформить', step)
 
         return KeyboardButton(config.KEYBOARD[name])
 
@@ -177,7 +177,7 @@ class Keyboards:
         itm_btn_5 = self.set_btn('BACK_STEP')
         itm_btn_6 = self.set_btn('AMOUNT_ORDERS', step='{} из {}'.format(parameters['number'], parameters['positions']))
         itm_btn_7 = self.set_btn('NEXT_STEP')
-        itm_btn_8 = self.set_btn('APPLAY', step=parameters['total_price'])
+        itm_btn_8 = self.set_btn('APPLY', step=parameters['total_price'])
         itm_btn_9 = self.set_btn('<<')
         # рассположение кнопок в меню
         self.markup.row(itm_btn_1,itm_btn_2,itm_btn_3,itm_btn_4)
