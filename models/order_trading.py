@@ -3,6 +3,7 @@ Model for working trader user with orders
 """
 from datetime import datetime
 from collections import OrderedDict
+import geopy
 from DB.DBAlchemy import DBManager
 from models.order import Order
 from models.order_info import OrderInfo
@@ -241,9 +242,20 @@ class OrderSpec:
     def id(self, order_id):
         self._id = order_id
 
+    def has_client(self):
+        return self._client > 0
+
     def set_client(self, client_id):
         self._client = client_id
 
+    def delivery_cost(self, db: DBManager):
+        """
+        calculate cost of delivery from nearest store
+        :param db: get addresses of stores
+        :return delivery_cost: cost is distance multiply to price_km of nearest store to client
+        """
+        pass
+    
     def status(self, status):
         if status != 0:
             print('STATUS:', status)

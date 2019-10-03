@@ -178,7 +178,10 @@ class HandlerAllText(Handler):
             trader_user.order.save(self.BD)
             trader_user.order_items.current_clear(self.BD)
             # отправляем ответ пользователю
-            self.bot.send_message(message.chat.id,
+            if not trader_user.order.has_client():
+
+            else:
+                self.bot.send_message(message.chat.id,
                                   MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
                                                            trader_user.order_items.number_items),
                                   parse_mode="HTML", reply_markup=self.keybords.category_menu())

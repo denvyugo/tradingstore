@@ -55,6 +55,19 @@ class HandlerInlineQuery(Handler):
         msg = 'Выбран заказ №{}, можете продолжить работу с заказом или выбрать другой'.format(code['o'])
         self.bot.send_message(trader.chat_id, msg, reply_markup=self.keybords.current_order_menu())
 
+    def pressed_btn_client(self, call, code):
+        """
+        add client to order
+        :param data:
+        :return:
+        """
+        trader = TraderUser(code['t'])
+        trader.load_order(db=self.BD, order_id=code['o'])
+        trader.order.set_client(client_id=code['c'])
+        trader.order.save(db=self.BD)
+        # calculate cost of delivery
+
+
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.
         @self.bot.callback_query_handler(func=lambda call: True)
@@ -64,3 +77,5 @@ class HandlerInlineQuery(Handler):
                 self.pressed_btn_product(call, code)
             if code['m'] == 'o':
                 self.pressed_btn_order(code=code)
+            if code['m'] == 'c':
+                self.pressed_btn_client(call=call, code=code)
