@@ -179,7 +179,7 @@ class HandlerAllText(Handler):
             trader_user.order_items.current_clear(self.BD)
             # отправляем ответ пользователю
             if not trader_user.order.has_client():
-
+                # TODO: send to user a list of clients to choose (inline buttons)
             else:
                 self.bot.send_message(message.chat.id,
                                   MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),

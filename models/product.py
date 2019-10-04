@@ -1,5 +1,5 @@
 # импортируем специальные поля Алхимии для инициализации полей таблицы
-from sqlalchemy import Column, DateTime, String, Integer, Float, Boolean, ForeignKey
+from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey
 # импортируем модуль для связки таблиц
 from sqlalchemy.orm import relationship, backref
 # импортируем модуль инициализации декларативного класса Алхимии 
