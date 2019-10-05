@@ -256,7 +256,8 @@ class OrderSpec:
         :param db: get addresses of stores
         :return delivery_cost: cost is distance multiply to price_km of nearest store to client
         """
-        if self._delivery_cost == 0:
+        print('DELIVERY COST:', self._delivery_cost)
+        if self._delivery_cost is None or self._delivery_cost == 0:
             if self._client == 0:
                 return 0
             if self._store == 0:
@@ -280,25 +281,31 @@ class OrderSpec:
         self._date = order_info.order_date
         self._delivery_cost = order_info.delivery_cost
         self._status = order_info.status
+        self._store = order_info.store_id
 
     def save(self, db: DBManager):
         if self._id:
             order = db.get_order_info(self._id)
             order.is_current = self._current
             order.client_id = self._client
+            order.delivery_cost = self._delivery_cost
             order.order_date = self._date
             order.status = self._status
+            order.store_id = self._store
             db.save_element(order)
         else:
             self._date = datetime.now()
-            order_info = self._get_order_info()
-            self._id = db.save_element(order_info)
+            order = self._get_order_info()
+            self._id = db.save_element(order)
+        return order
 
     def _get_order_info(self):
         order_info = OrderInfo(client_id=self._client,
                                is_current=self._current,
+                               delivery_cost=self._delivery_cost,
                                order_date=self._date,
                                status=self._status,
+                               store_id=self._store,
                                trader_id=self._trader)
         return order_info
 

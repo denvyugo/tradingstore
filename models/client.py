@@ -13,6 +13,7 @@ class Client(Base):
     latitude = Column(Float)
     longitude = Column(Float)
     phone = Column(String)
+    title = Column(String)
     user_name = Column(String)
 
     def __init__(self, address, chat_id, email, latitude, longitude, phone, title, user_name):
@@ -26,4 +27,4 @@ class Client(Base):
         self.user_name = user_name
 
     def __repr__(self):
-        return f'<Client: {self.id}>'
+        return f'<Client: {self.id}, {self.title}, {self.address}>'

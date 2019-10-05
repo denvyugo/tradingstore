@@ -64,9 +64,10 @@ class HandlerInlineQuery(Handler):
         trader = TraderUser(code['t'])
         trader.load_order(db=self.BD, order_id=code['o'])
         trader.order.set_client(client_id=code['c'])
-        trader.order.save(db=self.BD)
         # calculate cost of delivery
-
+        delivery_cost = trader.order.delivery_cost(db=self.BD)
+        trader.order.save(db=self.BD)
+        self.bot.answer_callback_query(call.id, 'Стоимость доставки {} рублей'.format(delivery_cost))
 
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.

@@ -423,7 +423,7 @@ class DBManager(metaclass=Singleton):
 
     def get_client(self, client_id):
         session = self.__session()
-        result = session.query(Client).filter_by(id=client_id).fetchone()
+        result = session.query(Client).filter_by(id=client_id).first()
         session.close()
         return result
 

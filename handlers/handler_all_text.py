@@ -48,7 +48,7 @@ class HandlerAllText(Handler):
         """
         trader_user = self._get_current_trader(message)
         self.bot.send_message(message.chat.id, 'Категория ' + config.KEYBOARD[product],
-                              reply_markup=self.keybords.set_select_category(trader_id=trader_user.id,
+                              reply_markup=self.keybords.set_select_category(trader=trader_user,
                                                                              category=config.CATEGORY[product]))
         self.bot.send_message(message.chat.id, "Ок",
                               reply_markup=self.keybords.category_menu())
@@ -174,22 +174,22 @@ class HandlerAllText(Handler):
         trader_user.load_current(db=self.BD)
         # if has order items
         if trader_user.order_items.number_positions > 0:
-            trader_user.order.status(status=config.Status.Work)
-            trader_user.order.save(self.BD)
-            trader_user.order_items.current_clear(self.BD)
             # отправляем ответ пользователю
             if not trader_user.order.has_client():
-                # TODO: send to user a list of clients to choose (inline buttons)
-            else:
                 self.bot.send_message(message.chat.id,
-                                  MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
-                                                           trader_user.order_items.number_items),
-                                  parse_mode="HTML", reply_markup=self.keybords.category_menu())
+                                      'Укажите адресата доставки заказа:',
+                                      reply_markup=self.keybords.set_select_client(trader=trader_user))
+                message_text = 'Выбор адресата'
+            else:
+                trader_user.order.status(status=config.Status.Work)
+                trader_user.order.save(self.BD)
+                trader_user.order_items.current_clear(self.BD)
+                message_text = MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
+                                                        trader_user.order_items.number_items)
         else:
             # если товара нет в заказе отправляем сообщение
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+            message_text = MESSAGES['no_orders']
+        self.bot.send_message(message.chat.id, message_text, parse_mode="HTML")
         # # отчищаем данные с заказа
         # self.BD.delete_all_order()
 

@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Float, String, Integer, DECIMAL
 # импортируем модуль инициализации декларативного класса Алхимии
+from sqlalchemy import Column, Float, String, Integer
 from DB.dbcore import Base
+
 
 class Store(Base):
     __tablename__ = 'stores'
@@ -8,7 +9,7 @@ class Store(Base):
     address = Column(String)
     latitude = Column(Float)
     longitude = Column(Float)
-    price_km = Column(DECIMAL)
+    price_km = Column(Float)
     title = Column(String)
 
     def __init__(self, address, latitude, longitude, price_km, title):
