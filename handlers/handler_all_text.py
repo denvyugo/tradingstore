@@ -48,7 +48,7 @@ class HandlerAllText(Handler):
         """
         trader_user = self._get_current_trader(message)
         self.bot.send_message(message.chat.id, 'Категория ' + config.KEYBOARD[product],
-                              reply_markup=self.keybords.set_select_category(trader_id=trader_user.id,
+                              reply_markup=self.keybords.set_select_category(trader=trader_user,
                                                                              category=config.CATEGORY[product]))
         self.bot.send_message(message.chat.id, "Ок",
                               reply_markup=self.keybords.category_menu())

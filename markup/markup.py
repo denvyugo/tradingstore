@@ -119,13 +119,15 @@ class Keyboards:
         self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
         return self.markup
 
-    def set_select_category(self, trader_id, category):
+    def set_select_category(self, trader, category):
         """ 
         Создает разметку инлайн кнопок в выбранной категории товара и возвращает разметку 
         """
         self.markup = InlineKeyboardMarkup(row_width=1)
         # загружаем в название инлайн кнопок данные с БД в соответствие с категорией товара
-        order_current = self.BD.get_order_current(trader_id=trader_id)
+        order_current = self.BD.get_order_current(trader_id=trader.id)
+        if order_current is None:
+            order_current = trader.order.save(self.BD)
         for itm in self.BD.select_all_products_category(category):
             # dump a data to json string
             # keys & values are: 'm' - menu: 'p' - products (add one product)
@@ -133,7 +135,7 @@ class Keyboards:
             #                    'o' - current order id
             #                    'p' - product id
             data = json.dumps({'m': 'p',
-                               't': trader_id,
+                               't': trader.id,
                                'o': order_current.id,
                                'p': itm.id},
                               separators=(',', ':'))

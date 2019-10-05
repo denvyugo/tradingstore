@@ -268,8 +268,9 @@ class OrderSpec:
             db.save_element(order)
         else:
             self._date = datetime.now()
-            order_info = self._get_order_info()
-            self._id = db.save_element(order_info)
+            order = self._get_order_info()
+            self._id = db.save_element(order)
+        return order
 
     def _get_order_info(self):
         order_info = OrderInfo(client_id=self._client,
