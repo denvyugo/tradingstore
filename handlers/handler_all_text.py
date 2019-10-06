@@ -174,19 +174,22 @@ class HandlerAllText(Handler):
         trader_user.load_current(db=self.BD)
         # if has order items
         if trader_user.order_items.number_positions > 0:
-            trader_user.order.status(status=config.Status.Work)
-            trader_user.order.save(self.BD)
-            trader_user.order_items.current_clear(self.BD)
             # отправляем ответ пользователю
-            self.bot.send_message(message.chat.id,
-                                  MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
-                                                           trader_user.order_items.number_items),
-                                  parse_mode="HTML", reply_markup=self.keybords.category_menu())
+            if not trader_user.order.has_client():
+                self.bot.send_message(message.chat.id,
+                                      'Укажите адресата доставки заказа:',
+                                      reply_markup=self.keybords.set_select_client(trader=trader_user))
+                message_text = 'Выбор адресата'
+            else:
+                trader_user.order.status(status=config.Status.Work)
+                trader_user.order.save(self.BD)
+                trader_user.order_items.current_clear(self.BD)
+                message_text = MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
+                                                        trader_user.order_items.number_items)
         else:
             # если товара нет в заказе отправляем сообщение
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+            message_text = MESSAGES['no_orders']
+        self.bot.send_message(message.chat.id, message_text, parse_mode="HTML")
         # # отчищаем данные с заказа
         # self.BD.delete_all_order()
 

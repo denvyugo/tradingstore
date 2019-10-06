@@ -163,6 +163,28 @@ class Keyboards:
                 self.markup.add(self.set_inline_btn(str(order), data))
             return self.markup
 
+    def set_select_client(self, trader: TraderUser):
+        """
+        set menu of list of clients
+        :param trader:
+        :return markup: inline buttons
+        """
+        clients = self.BD.get_clients()
+        if len(clients):
+            self.markup = InlineKeyboardMarkup(row_width=1)
+            for client in clients:
+                # dump a data to json string
+                # keys & values are: 'm' - menu: 'c' - clients (choose one client for order)
+                #                    't' - trader id
+                #                    'o' - order id
+                #                    'c' - client id
+                data = json.dumps({'m': 'c',
+                                   't': trader.id,
+                                   'o': trader.order.id,
+                                   'c': client.id})
+                self.markup.add(self.set_inline_btn(str(client), data))
+            return self.markup
+
     def orders_menu(self, step):
         """ 
         Создает разметку кнопок в заказе товара и возвращает разметку

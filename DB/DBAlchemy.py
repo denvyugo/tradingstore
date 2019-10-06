@@ -10,9 +10,11 @@ from settings import utility
 from DB.dbcore import Base
 
 from models.category import Category
+from models.client import Client
 from models.order import Order
 from models.order_info import OrderInfo
 from models.product import Products
+from models.store import Store
 from models.user import User
 
 
@@ -407,6 +409,34 @@ class DBManager(metaclass=Singleton):
         user = session.query(User).filter_by(id=user_id).first()
         session.close()
         return user
+
+    # Working with clients
+    def get_clients(self):
+        """
+        get list of clients
+        :return result: all clients query list
+        """
+        session = self.__session()
+        result = session.query(Client).all()
+        session.close()
+        return result
+
+    def get_client(self, client_id):
+        session = self.__session()
+        result = session.query(Client).filter_by(id=client_id).first()
+        session.close()
+        return result
+
+    # Working with store
+    def get_stores(self):
+        """
+        get list of stores
+        :return result: all stores query list
+        """
+        session = self.__session()
+        result = session.query(Store).all()
+        session.close()
+        return result
 
     # Working with session
     def close(self):

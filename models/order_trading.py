@@ -3,6 +3,7 @@ Model for working trader user with orders
 """
 from datetime import datetime
 from collections import OrderedDict
+from geopy.distance import distance
 from DB.DBAlchemy import DBManager
 from models.order import Order
 from models.order_info import OrderInfo
@@ -228,8 +229,10 @@ class OrderSpec:
     def __init__(self, trader_id):
         self._client = 0
         self._date = None
+        self._delivery_cost = 0
         self._current = True
         self._status = Status.New
+        self._store = 0
         self._trader = trader_id
         self._id = 0
 
@@ -241,8 +244,28 @@ class OrderSpec:
     def id(self, order_id):
         self._id = order_id
 
+    def has_client(self):
+        return self._client > 0
+
     def set_client(self, client_id):
         self._client = client_id
+
+    def delivery_cost(self, db: DBManager):
+        """
+        calculate cost of delivery from nearest store
+        :param db: get addresses of stores
+        :return delivery_cost: cost is distance multiply to price_km of nearest store to client
+        """
+        print('DELIVERY COST:', self._delivery_cost)
+        if self._delivery_cost is None or self._delivery_cost == 0:
+            if self._client == 0:
+                return 0
+            if self._store == 0:
+                # get nearest store
+                client_distance, store_id, price_km = self._get_store_near(db)
+                self._store = store_id
+                self._delivery_cost = round(client_distance * price_km, 2)
+        return self._delivery_cost
 
     def status(self, status):
         if status != 0:
@@ -256,15 +279,19 @@ class OrderSpec:
         self._client = order_info.client_id
         self._current = order_info.is_current
         self._date = order_info.order_date
+        self._delivery_cost = order_info.delivery_cost
         self._status = order_info.status
+        self._store = order_info.store_id
 
     def save(self, db: DBManager):
         if self._id:
             order = db.get_order_info(self._id)
             order.is_current = self._current
             order.client_id = self._client
+            order.delivery_cost = self._delivery_cost
             order.order_date = self._date
             order.status = self._status
+            order.store_id = self._store
             db.save_element(order)
         else:
             self._date = datetime.now()
@@ -275,10 +302,34 @@ class OrderSpec:
     def _get_order_info(self):
         order_info = OrderInfo(client_id=self._client,
                                is_current=self._current,
+                               delivery_cost=self._delivery_cost,
                                order_date=self._date,
                                status=self._status,
+                               store_id=self._store,
                                trader_id=self._trader)
         return order_info
+
+    def _get_store_near(self, db: DBManager):
+        client = db.get_client(self._client)
+        stores = db.get_stores()
+        client_distance = 0.0
+        store_distance = 0.0
+        store_id = 0
+        price_km = 0.0
+        client_location = (client.latitude, client.longitude)
+        for store in stores:
+            store_location = (store.latitude, store.longitude)
+            if client_distance == 0.0:
+                client_distance = distance(client_location, store_location).kilometers
+                store_id = store.id
+                price_km = store.price_km
+                continue
+            store_distance = distance(client_location, store_location).kilometers
+            if store_distance < client_distance:
+                client_distance = store_distance
+                store_id = store.id
+                price_km = store.price_km
+        return client_distance, store_id, price_km
 
 
 """class for Trader"""
