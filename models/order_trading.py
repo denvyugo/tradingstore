@@ -237,6 +237,10 @@ class OrderSpec:
         self._id = 0
 
     @property
+    def date(self):
+        return self._date
+
+    @property
     def id(self):
         return self._id
 
@@ -246,6 +250,9 @@ class OrderSpec:
 
     def has_client(self):
         return self._client > 0
+
+    def get_client(self):
+        return self._client
 
     def set_client(self, client_id):
         self._client = client_id

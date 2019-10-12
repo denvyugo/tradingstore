@@ -47,6 +47,7 @@ class DBManager(metaclass=Singleton):
         self._session = self.__session()
         if not os.path.isfile(config.DATABASE):
             Base.metadata.create_all(self.engine)
+            self._set_tabs()
 
     def _set_tabs(self):
         """ 
