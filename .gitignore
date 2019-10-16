@@ -1,8 +1,0 @@
-venv/
-settings/token.txt
-__pycache__/
-*.py[cod]
-*$py.class
-.idea/
-test*.py
-*.db
