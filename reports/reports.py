@@ -7,6 +7,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import mm
 
+from settings import config
+
 font_arial = ttfonts.TTFont('Arial', 'arial.ttf')
 pdfmetrics.registerFont(font_arial)
 
@@ -39,7 +41,9 @@ class ReportInvoice:
         :param number: order number
         :return path: invoice file name
         """
-        return './invoices/invoice{:06}.pdf'.format(number)
+        base_folder = config.invoices_folder()
+        invoice_file = 'invoice{:06}.pdf'.format(number)
+        return config.os.path.join(base_folder,invoice_file)
 
     def set_order(self, date, number, payer, address, delivery):
         self._order.date = date
@@ -150,6 +154,9 @@ class ReportInvoice:
                               showBoundary = False)
         self._story.append(Spacer(1, 70 * mm))
         self._story.append(self._order_table())
-        doc.build(self._story,
+        try:
+            doc.build(self._story,
                   onFirstPage=self._first_page,
                   onLaterPages=self._later_page)
+        except PermissionError as e:
+            print(e.strerror)

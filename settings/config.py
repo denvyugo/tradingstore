@@ -14,6 +14,14 @@ AUTHOR = 'Zveryaka A.'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Path to DB
 DATABASE = os.path.join('sqlite:///'+BASE_DIR, NAME_DB)
+# folder for invoices
+INVOICES_FOLDER = 'invoices'
+def invoices_folder():
+    invoices_path, _ = os.path.split(BASE_DIR)
+    invoices_path = os.path.join(invoices_path, INVOICES_FOLDER)
+    if not os.path.isdir(invoices_path):
+        os.mkdir(invoices_path)
+    return invoices_path
 
 # токен выдается при регистрации приложения, храним в текстовом файле
 def get_token():
