@@ -209,3 +209,27 @@ class Keyboards:
         self.markup.row(itm_btn_9,itm_btn_8)  
 
         return self.markup
+
+    def admin_menu(self):
+        """
+        make admin menu
+        :return markup:
+        """
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY'])
+        self.markup.row(itm_btn1)
+        return self.markup
+
+    def company_change(self):
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY_CHANGE'])
+        itm_btn2 = KeyboardButton(config.ADMINISTRATIVE['MAIN'])
+        self.markup.row(itm_btn1, itm_btn2)
+        return self.markup
+
+    def company_add(self):
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY_ADD'])
+        itm_btn2 = KeyboardButton(config.ADMINISTRATIVE['MAIN'])
+        self.markup.row(itm_btn1, itm_btn2)
+        return self.markup

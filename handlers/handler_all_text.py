@@ -230,13 +230,8 @@ class HandlerAllText(Handler):
         :param trader:
         :return:
         """
-        info = {}
-        try:
-            with open('settings/company.json', mode='r') as file_obj:
-                info = json.load(file_obj)
-        except Exception as e:
-            print(e)
-        if len(info):
+        if config.is_company_info():
+            info = config.company_info()
             invoice = ReportInvoice()
             invoice.company_info(info)
             client = self.BD.get_client(trader.order.get_client())
@@ -298,9 +293,19 @@ class HandlerAllText(Handler):
         user = self.BD.get_user(chat_id=message.chat.id)
         return TraderUser(user.id, message.from_user.first_name)
 
+    def _add_admin(self, message):
+        """
+        add new user with role 'Admin'
+        :param message:
+        :return:
+        """
+        user = User(chat_id=message.chat.id, role=config.Role.Admin)
+        self.BD.save_element(user)
+        self.bot.send_message(message.chat.id, 'Приятной работы', reply_markup=self.keybords.admin_menu())
+
     def handle(self):
         # обработчик(декоратор) сообщений, который обрабатывает входящие текстовые сообщения от нажатия кнопок.
-        @self.bot.message_handler(func=lambda message: True)
+        @self.bot.message_handler(func=lambda message: message.text in config.KEYBOARD.values())
         def handle(message):
             # ********** меню (выбор роли)                          **********
             if message.text == config.KEYBOARD['TRADER']:
@@ -308,7 +313,7 @@ class HandlerAllText(Handler):
             if message.text == config.KEYBOARD['KEEPER']:
                 pass
             if message.text == config.KEYBOARD['ADMIN']:
-                pass
+                self._add_admin(message)
 
             # ********** меню (выбор категории, настройки, сведения)**********
             if message.text == config.KEYBOARD['CHOOSE_ORDER']:
@@ -365,5 +370,5 @@ class HandlerAllText(Handler):
             if message.text == config.KEYBOARD['APPLY']:
                 self.pressed_btn_apply(message)
             # иные нажатия и ввод данных пользователем
-            else:
-                self.bot.send_message(message.chat.id, message.text)
+            # else:
+            #     self.bot.send_message(message.chat.id, message.text)
