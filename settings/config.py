@@ -127,3 +127,16 @@ class DialogState(IntEnum):
     BankAccountID = 8
     BankAccountAccount = 9
     BankAccountCorrespondent = 10
+
+dialog_state_name = {
+    DialogState.CompanyName: 'название компании',
+    DialogState.CompanyTaxpayer: 'ИНН компании',
+    DialogState.CompanyRegistrationID: 'КПП компании',
+    DialogState.CompanyAddress: 'адрес компании',
+    DialogState.CompanyPhone: 'телефон компании',
+    DialogState.CompanyEmail: 'электронный адрес компании',
+    DialogState.BankAccountName: 'название банка компании',
+    DialogState.BankAccountID: 'БИК банка компании',
+    DialogState.BankAccountAccount: 'номер расчётного счёта комании',
+    DialogState.BankAccountCorrespondent: 'номер корреспондентского счёта компании'
+}

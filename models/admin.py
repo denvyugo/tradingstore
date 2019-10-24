@@ -134,7 +134,9 @@ class Admin:
         :param company_name:
         :return True: is company name is valid, False: otherwise
         """
-        self._dialog.info['name'] = company_name
+        check = True
+        if check: self._dialog.info['name'] = company_name
+        return check
 
     def get_company_taxpayer(self):
         if 'taxpayerID' in self._dialog.info:
@@ -191,7 +193,7 @@ class Admin:
             check_sum += int(n) * k
         return (check_sum % 11) % 10
 
-     def get_company_address(self):
+    def get_company_address(self):
         if 'address' in self._dialog.info:
             return self._dialog.info['address']
         else:
@@ -223,7 +225,7 @@ class Admin:
         if check: self._dialog.info['phone'] = phone
         return check
 
-     def get_company_email(self):
+    def get_company_email(self):
         if 'email' in self._dialog.info:
             return self._dialog.info['email']
         else:
@@ -253,7 +255,9 @@ class Admin:
         :return True: if bank name is valid, False: otherwise
         """
         check = True
-        if check: self._dialog.info['bank_account']['name'] = bank_name
+        if check:
+            self._check_info_bank()
+            self._dialog.info['bank_account']['name'] = bank_name
         return check
 
     def get_bank_id(self):
@@ -272,7 +276,9 @@ class Admin:
         check = False
         if bank_id.isnumeric():
             check = len(bank_id) == 9
-        if check: self._dialog.info['bank_account']['id'] = bank_id
+        if check:
+            self._check_info_bank()
+            self._dialog.info['bank_account']['id'] = bank_id
         return check
 
     def get_bank_account(self):
@@ -289,10 +295,12 @@ class Admin:
         :return True: if bank account is valid, False: otherwise
         """
         check = False
-        if bank_id.isnumeric():
+        if bank_account.isnumeric():
             if len(bank_account) == 20:
-                check = _check_account(bank_account)
-        if check: self._dialog.info['bank_account']['account'] = bank_account
+                check = self._check_account(bank_account)
+        if check:
+            self._check_info_bank()
+            self._dialog.info['bank_account']['account'] = bank_account
         return check
 
     def get_bank_corr(self):
@@ -309,10 +317,12 @@ class Admin:
         :return True: if bank corr account is valid, False: otherwise
         """
         check = False
-        if bank_id.isnumeric():
+        if bank_corr.isnumeric():
             if len(bank_corr) == 20:
-                check = _check_account(bank_corr)
-        if check: self._dialog.info['bank_account']['corr_acc'] = bank_corr
+                check = True
+        if check:
+            self._check_info_bank()
+            self._dialog.info['bank_account']['corr_acc'] = bank_corr
         return check
 
     def _check_account(self, account):
@@ -325,3 +335,7 @@ class Admin:
         for n, k in zip(account, '713' * 8):
             check_sum += int(n) * int(k)
         return (check_sum % 10) == 0
+
+    def _check_info_bank(self):
+        if not 'bank_account' in self._dialog.info:
+            self._dialog.info['bank_account'] = {}
