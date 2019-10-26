@@ -26,17 +26,38 @@ class HandlerAdmin(Handler):
             if is_company_info():
                 info = company_info()
                 admin.set_company_info(company_info=info)
-                reply = MESSAGES['company_info'].format(info['name'], info['taxpayerID'], info['registrationID'],
-                                                        info['address'], info['phone'], info['email'],
-                                                        info['bank_account']['name'], info['bank_account']['id'],
-                                                        info['bank_account']['account'],
-                                                        info['bank_account']['corr_acc'])
+                admin.dialog_type = True
+                reply = _format_company_info_mes(info)
                 markup = self.keybords.company_change()
             else:
+                admin.dialog_type = False
                 reply = MESSAGES['no_company']
                 markup = self.keybords.company_add()
             admin.dialog_status = DialogState.NoDialog
             self.bot.send_message(message.chat.id, reply, parse_mode='HTML', reply_markup=markup)
+
+        @self.bot.message_handler(func=lambda message: message.text == ADMINISTRATIVE['MAIN'])
+        def admin_main(message):
+            """
+            intro to main admin menu
+            :param message:
+            :return:
+            """
+            admin = Admin(chat_id=message.chat.id)
+            admin.dialog_status = DialogState.NoDialog
+            self.bot.send_message(message.chat.id, 'Главное меню', reply_markup=self.keybords.admin_menu())
+
+        def _format_company_info_mes(info):
+            """
+            format company info message
+            :param info:
+            :return message:
+            """
+            return  MESSAGES['company_info'].format(info['name'], info['taxpayerID'], info['registrationID'],
+                                            info['address'], info['phone'], info['email'],
+                                            info['bank_account']['name'], info['bank_account']['id'],
+                                            info['bank_account']['account'],
+                                            info['bank_account']['corr_acc'])
 
         @self.bot.message_handler(func=lambda message: _start_dialog_property(message.text))
         def start_dialog_property(message):
@@ -46,10 +67,9 @@ class HandlerAdmin(Handler):
             :return:
             """
             admin = Admin(chat_id=message.chat.id)
-            company = admin.get_company_name()
-            if len(company):
-                reply = '<b>Компания:</b> {}'.format(company)
-                self.bot.send_message(message.chat.id, reply, parse_mode='HTML')
+            if admin.dialog_type:
+                company = admin.get_company_name()
+                _send_current_value(admin.chat_id, DialogState.CompanyName, company)
             _change_dialog_state(admin, DialogState.CompanyName)
 
         @self.bot.message_handler(func=lambda message: _dialog_state(message.chat.id) == DialogState.CompanyName)
@@ -61,6 +81,9 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_name(message.text):
+                if admin.dialog_type:
+                    value = admin.get_company_taxpayer()
+                    _send_current_value(admin.chat_id, DialogState.CompanyTaxpayer, value)
                 _change_dialog_state(admin, DialogState.CompanyTaxpayer)
             else:
                 reply = 'Повторите, пожалуйста ввод'
@@ -75,12 +98,16 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_taxpayer(message.text):
+                if admin.dialog_type:
+                    value = admin.get_company_registry()
+                    _send_current_value(admin.chat_id, DialogState.CompanyRegistrationID, value)
                 _change_dialog_state(admin, DialogState.CompanyRegistrationID)
             else:
                 reply = 'Повторите, пожалуйста ввод'
                 self.bot.send_message(message.chat.id, reply)
 
-        @self.bot.message_handler(func=lambda message: _dialog_state(message.chat.id) == DialogState.CompanyRegistrationID)
+        @self.bot.message_handler(
+            func=lambda message: _dialog_state(message.chat.id) == DialogState.CompanyRegistrationID)
         def input_company_registration(message):
             """
             input company registration ID
@@ -89,6 +116,9 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_registry(message.text):
+                if admin.dialog_type:
+                    value = admin.get_company_address()
+                    _send_current_value(admin.chat_id, DialogState.CompanyAddress, value)
                 _change_dialog_state(admin, DialogState.CompanyAddress)
             else:
                 reply = 'Повторите, пожалуйста ввод'
@@ -103,6 +133,9 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_address(message.text):
+                if admin.dialog_type:
+                    value = admin.get_company_phone()
+                    _send_current_value(admin.chat_id, DialogState.CompanyPhone, value)
                 _change_dialog_state(admin, DialogState.CompanyPhone)
             else:
                 reply = 'Повторите, пожалуйста ввод'
@@ -118,6 +151,9 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_phone(message.text):
+                if admin.dialog_type:
+                    value = admin.get_company_email()
+                    _send_current_value(admin.chat_id, DialogState.CompanyEmail, value)
                 _change_dialog_state(admin, DialogState.CompanyEmail)
             else:
                 reply = 'Повторите, пожалуйста ввод'
@@ -132,13 +168,16 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_company_email(message.text):
+                if admin.dialog_type:
+                    value = admin.get_bank_name()
+                    _send_current_value(admin.chat_id, DialogState.BankAccountName, value)
                 _change_dialog_state(admin, DialogState.BankAccountName)
             else:
                 reply = 'Повторите, пожалуйста ввод'
                 self.bot.send_message(message.chat.id, reply)
 
         @self.bot.message_handler(func=lambda message: _dialog_state(message.chat.id) == DialogState.BankAccountName)
-        def input_company_email(message):
+        def input_bank_name(message):
             """
             input company bank name
             :param message:
@@ -146,13 +185,16 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_bank_name(message.text):
+                if admin.dialog_type:
+                    value = admin.get_bank_id()
+                    _send_current_value(admin.chat_id, DialogState.BankAccountID, value)
                 _change_dialog_state(admin, DialogState.BankAccountID)
             else:
                 reply = 'Повторите, пожалуйста ввод'
                 self.bot.send_message(message.chat.id, reply)
 
         @self.bot.message_handler(func=lambda message: _dialog_state(message.chat.id) == DialogState.BankAccountID)
-        def input_company_email(message):
+        def input_bank_id(message):
             """
             input company bank id
             :param message:
@@ -160,13 +202,16 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_bank_id(message.text):
+                if admin.dialog_type:
+                    value = admin.get_bank_account()
+                    _send_current_value(admin.chat_id, DialogState.BankAccountAccount, value)
                 _change_dialog_state(admin, DialogState.BankAccountAccount)
             else:
                 reply = 'Повторите, пожалуйста ввод'
                 self.bot.send_message(message.chat.id, reply)
 
         @self.bot.message_handler(func=lambda message: _dialog_state(message.chat.id) == DialogState.BankAccountAccount)
-        def input_company_email(message):
+        def input_bank_account(message):
             """
             input company bank account
             :param message:
@@ -174,6 +219,9 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_bank_account(message.text):
+                if admin.dialog_type:
+                    value = admin.get_bank_corr()
+                    _send_current_value(admin.chat_id, DialogState.BankAccountCorrespondent, value)
                 _change_dialog_state(admin, DialogState.BankAccountCorrespondent)
             else:
                 reply = 'Повторите, пожалуйста ввод'
@@ -181,7 +229,7 @@ class HandlerAdmin(Handler):
 
         @self.bot.message_handler(
             func=lambda message: _dialog_state(message.chat.id) == DialogState.BankAccountCorrespondent)
-        def input_company_email(message):
+        def input_bank_corr(message):
             """
             input company bank correspondent account
             :param message:
@@ -189,7 +237,12 @@ class HandlerAdmin(Handler):
             """
             admin = Admin(chat_id=message.chat.id)
             if admin.set_bank_corr(message.text):
+                admin.dialog_info_save()
                 _change_dialog_state(admin, DialogState.NoDialog)
+                info = company_info()
+                reply = _format_company_info_mes(info)
+                markup = self.keybords.company_change()
+                self.bot.send_message(message.chat.id, reply, parse_mode='HTML', reply_markup=markup)
             else:
                 reply = 'Повторите, пожалуйста ввод'
                 self.bot.send_message(message.chat.id, reply)
@@ -217,3 +270,14 @@ class HandlerAdmin(Handler):
             if state in dialog_state_name:
                 reply = '<b>Укажите {}:</b>'.format(dialog_state_name[state])
                 self.bot.send_message(admin.chat_id, reply, parse_mode='HTML')
+
+        def _send_current_value(chat_id, state, value):
+            """
+            send current value of parameter to change
+            :param state:
+            :param value:
+            :return:
+            """
+            if len(value):
+                reply = '<b>{}:</b> {}'.format(dialog_state_name[state], value)
+                self.bot.send_message(chat_id, reply, parse_mode='HTML')

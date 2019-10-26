@@ -1,6 +1,7 @@
 """
 Models for administrative users
 """
+import json
 import shelve
 from settings import config
 
@@ -52,6 +53,7 @@ class Dialog:
         self._state = None
         self._check_state()
         self._check_info()
+        self._check_type()
 
     def finish(self):
         self._dialog.close()
@@ -75,6 +77,31 @@ class Dialog:
             self._info = self._dialog[INFO_KEY]
         else:
             self.info = self._info
+
+    def _check_type(self):
+        """
+        check if dialog has a type parameter (bool: True is change dialog type, False: if add dialog type)
+        :return:
+        """
+        if not 'type' in self._dialog:
+            self._dialog['type'] = False
+
+    @property
+    def type(self):
+        """
+        get type status of dialog
+        :return:
+        """
+        return self._dialog['type']
+
+    @type.setter
+    def type(self, dialog_type):
+        """
+        set type of dialog
+        :param dialog_type:
+        :return:
+        """
+        self._dialog['type'] = dialog_type
 
     @property
     def state(self):
@@ -118,6 +145,22 @@ class Admin:
     @dialog_status.setter
     def dialog_status(self, dialog_status):
         self._dialog.state = dialog_status
+
+    @property
+    def dialog_type(self):
+        return self._dialog.type
+
+    @dialog_type.setter
+    def dialog_type(self, dialog_type):
+        self._dialog.type = dialog_type
+
+    def dialog_info_save(self):
+        """
+        save info about company from dialog to json file
+        :return:
+        """
+        with open(config.COMPANY_INFO, mode='w') as file_obj:
+            json.dump(self._dialog.info, file_obj)
 
     def set_company_info(self, company_info):
         self._dialog.info = company_info

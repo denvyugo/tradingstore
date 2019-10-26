@@ -1,3 +1,4 @@
+import json
 import os
 from enum import IntEnum
 # импортируем модуль emoji для отображения эмоджи
@@ -43,7 +44,7 @@ def company_info():
     get dict from company info json file
     :return info: dict of company info
     """
-    with open(config.COMPANY_INFO, mode='r') as file_obj:
+    with open(COMPANY_INFO, mode='r') as file_obj:
         info = json.load(file_obj)
     return info
 
