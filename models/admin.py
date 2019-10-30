@@ -3,10 +3,12 @@ Models for administrative users
 """
 import json
 import shelve
+from DB.DBAlchemy import DBManager
+from models.store import Store
 from settings import config
 
 INFO_KEY = 'info'
-
+STORE_KEY = 'store'
 REGISTRY_CODE = (
     '01',
     '02',
@@ -50,6 +52,7 @@ class Dialog:
         self._dialog = shelve.open(config.DIALOG, writeback=True)
         self._id = str(chat_id)
         self._info = {}
+        self._store = {}
         self._state = None
         self._check_state()
         self._check_info()
@@ -77,6 +80,16 @@ class Dialog:
             self._info = self._dialog[INFO_KEY]
         else:
             self.info = self._info
+
+    def _check_store(self):
+        """
+        check if dict of store info in shelve file, add if not
+        :return:
+        """
+        if STORE_KEY in self._dialog:
+            self._store = self._dialog[STORE_KEY]
+        else:
+            self.store = self._store
 
     def _check_type(self):
         """
@@ -120,6 +133,15 @@ class Dialog:
     def info(self, company_info):
         self._info = company_info
         self._dialog[INFO_KEY] = self._info
+
+    @property
+    def store(self):
+        return  self._store
+
+    @store.setter
+    def store(self, store_info):
+        self._store = store_info
+        self._dialog[STORE_KEY] = self._store
 
 
 class Admin:
@@ -382,3 +404,99 @@ class Admin:
     def _check_info_bank(self):
         if not 'bank_account' in self._dialog.info:
             self._dialog.info['bank_account'] = {}
+
+    def dialog_store_save(self, db: DBManager):
+        """
+        save info about store from dialog to database
+        :return:
+        """
+        store = Store()
+        store.title = self._dialog.store['title']
+        store.address = self._dialog.store['address']
+        store.longitude = self._dialog.store['longitude']
+        store.latitude = self._dialog.store['latitude']
+        store.price_km = self._dialog.store['price']
+        db.save_element(store)
+
+    def set_store_info(self, store_info):
+        self._dialog.store = store_info
+
+    def get_store_title(self):
+        if 'title' in self._dialog.store:
+            return self._dialog.store['title']
+        else:
+            return ''
+
+    def set_store_title(self, store_title):
+        """
+        if store title is valid return True, else False
+        :param store_title:
+        :return True: is store title is valid, False: otherwise
+        """
+        check = True
+        if check: self._dialog.store['title'] = store_title
+        return check
+
+    def get_store_address(self):
+        if 'address' in self._dialog.store:
+            return self._dialog.store['address']
+        else:
+            return ''
+
+    def set_store_address(self, store_address):
+        """
+        if store address is valid return True, else False
+        :param store_address:
+        :return True: is store address is valid, False: otherwise
+        """
+        check = True
+        if check: self._dialog.store['address'] = store_address
+        return check
+
+    def get_store_longitude(self):
+        if 'longitude' in self._dialog.store:
+            return self._dialog.store['longitude']
+        else:
+            return ''
+
+    def set_store_longitude(self, store_longitude):
+        """
+        if store longitude is valid return True, else False
+        :param store_longitude:
+        :return True: is store longitude is valid, False: otherwise
+        """
+        check = True
+        if check: self._dialog.store['longitude'] = store_longitude
+        return check
+
+    def get_store_longitude(self):
+        if 'longitude' in self._dialog.store:
+            return self._dialog.store['longitude']
+        else:
+            return ''
+
+    def set_store_latitude(self, store_latitude):
+        """
+        if store latitude is valid return True, else False
+        :param store_latitude:
+        :return True: is store latitude is valid, False: otherwise
+        """
+        check = True
+        if check: self._dialog.store['latitude'] = store_latitude
+        return check
+
+    def get_store_price(self):
+        if 'price' in self._dialog.store:
+            return self._dialog.store['price']
+        else:
+            return ''
+
+    def set_store_price(self, store_price):
+        """
+        if store delivery price per km is valid return True, else False
+        :param price:
+        :return True: is store delivery price per km is valid, False: otherwise
+        """
+        check = True
+        if check: self._dialog.store['price'] = store_price
+        return check

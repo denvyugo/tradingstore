@@ -80,11 +80,12 @@ KEYBOARD = {
 ADMINISTRATIVE = {
     'MAIN': 'В начало',
     'PROPERTY': 'Реквизиты',
+    'STORE': 'Склад',
     'PROPERTY_CHANGE': 'Изменить',
     'PROPERTY_ADD': 'Добавить'
 }
 
-# Id ctegory to products
+# Id category to products
 CATEGORY = {
     'SEMIPRODUCT': 1,
     'GROCERY': 2,
@@ -139,5 +140,10 @@ dialog_state_name = {
     DialogState.BankAccountName: 'название банка компании',
     DialogState.BankAccountID: 'БИК банка компании',
     DialogState.BankAccountAccount: 'номер расчётного счёта комании',
-    DialogState.BankAccountCorrespondent: 'номер корреспондентского счёта компании'
+    DialogState.BankAccountCorrespondent: 'номер корреспондентского счёта компании',
+    DialogState.StoreAddress: 'адрес склада',
+    DialogState.StoreLongitude: 'долгота (координаты склада)',
+    DialogState.StoreLatitude: 'широта (координаты склада)',
+    DialogState.StoreTitle: 'название склада',
+    DialogState.StoreDeliveryPrice: 'стоимость доставки за км'
 }

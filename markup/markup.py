@@ -217,7 +217,8 @@ class Keyboards:
         """
         self.markup = ReplyKeyboardMarkup(True, True)
         itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY'])
-        self.markup.row(itm_btn1)
+        itm_btn2 = KeyboardButton(config.ADMINISTRATIVE['STORE'])
+        self.markup.row(itm_btn1, itm_btn2)
         return self.markup
 
     def company_change(self):

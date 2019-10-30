@@ -36,6 +36,16 @@ class HandlerAdmin(Handler):
             admin.dialog_status = DialogState.NoDialog
             self.bot.send_message(message.chat.id, reply, parse_mode='HTML', reply_markup=markup)
 
+        @self.bot.message_handler(func=lambda message: message.text == ADMINISTRATIVE['STORE'])
+        def check_store(message):
+            """
+            check if store info is present in database than get it and try to change - set dialog type True,
+            otherwise: try to add a new strore info - set dialog type False
+            :param message:
+            :return:
+            """
+            # TODO: implement method to start dialog about store information
+
         @self.bot.message_handler(func=lambda message: message.text == ADMINISTRATIVE['MAIN'])
         def admin_main(message):
             """
