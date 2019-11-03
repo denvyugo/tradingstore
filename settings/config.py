@@ -105,6 +105,10 @@ class Role(IntEnum):
     Keeper = 2
     Admin = 3
 
+# hash for default password for each roles
+DEFAULT_TRADER = b'e6abfb67407de540f6e9385892fe20f35d56c47ef5bcf9aae8b12b1f6b7078d1'
+DEFAULT_KEEPER = b'21c0e9cd6dd58086d61d9682524d47b933ded967c99a61eb5321e2ebd4439319'
+DEFAULT_ADMIN = b'd29451272bec641a9a9628742a8629e877a551220a2c839b7d43398d2c370ffa'
 
 # Order's Status
 class Status(IntEnum):
@@ -129,6 +133,14 @@ class DialogState(IntEnum):
     BankAccountID = 8
     BankAccountAccount = 9
     BankAccountCorrespondent = 10
+    StoreAddress = 11
+    StoreLongitude =12
+    StoreLatitude = 13
+    StoreTitle = 14
+    StoreDeliveryPrice = 15
+    UserTrader = 16
+    UserKeeper = 17
+    UserAdmin = 18
 
 dialog_state_name = {
     DialogState.CompanyName: 'название компании',
@@ -145,5 +157,8 @@ dialog_state_name = {
     DialogState.StoreLongitude: 'долгота (координаты склада)',
     DialogState.StoreLatitude: 'широта (координаты склада)',
     DialogState.StoreTitle: 'название склада',
-    DialogState.StoreDeliveryPrice: 'стоимость доставки за км'
+    DialogState.StoreDeliveryPrice: 'стоимость доставки за км',
+    DialogState.UserTrader: 'пароль для торгового представителя',
+    DialogState.UserKeeper: 'пароль для работника склада',
+    DialogState.UserAdmin: 'пароль для администратора'
 }
