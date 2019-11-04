@@ -401,13 +401,14 @@ class HandlerAllText(Handler):
         @self.bot.message_handler(func=lambda message: _dialog_password(message.chat.id))
         def _check_password(message):
             new_user = DefaultUser(chat_id=message.chat.id)
-            if new_user.check_password(message.tex):
+            if new_user.check_password(message.text):
                 if new_user.dialog_status == config.DialogState.UserTrader:
                     self._add_trader(message)
                 if new_user.dialog_status == config.DialogState.UserKeeper:
                     self._add_keeper(message)
                 if new_user.dialog_status == config.DialogState.UserAdmin:
                     self._add_admin(message)
+                new_user.dialog_status = config.DialogState.NoDialog
             else:
                 self.bot.send_message(message.chat.id, 'Повторите ввод')
 

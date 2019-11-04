@@ -76,6 +76,11 @@ KEYBOARD = {
     'ADMIN': 'Admin'
 }
 
+# Keyboard for keeper
+KEEPER = {
+    'GET_ORDERS': 'Список заказов'
+}
+
 # Keyboard for administrator
 ADMINISTRATIVE = {
     'MAIN': 'В начало',
