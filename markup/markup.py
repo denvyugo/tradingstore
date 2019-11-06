@@ -222,6 +222,10 @@ class Keyboards:
         return self.markup
 
     def company_change(self):
+        """
+        keyboard for company change admin's dialog
+        :return markup:
+        """
         self.markup = ReplyKeyboardMarkup(True, True)
         itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY_CHANGE'])
         itm_btn2 = KeyboardButton(config.ADMINISTRATIVE['MAIN'])
@@ -229,8 +233,31 @@ class Keyboards:
         return self.markup
 
     def company_add(self):
+        """
+        keyboard for add new company admin's dialog
+        :return markup:
+        """
         self.markup = ReplyKeyboardMarkup(True, True)
         itm_btn1 = KeyboardButton(config.ADMINISTRATIVE['PROPERTY_ADD'])
         itm_btn2 = KeyboardButton(config.ADMINISTRATIVE['MAIN'])
         self.markup.row(itm_btn1, itm_btn2)
         return self.markup
+
+    def keeper_menu(self):
+        """
+        make keeper's main menu
+        :return markup:
+        """
+        self.markup = ReplyKeyboardMarkup(True, True)
+        itm_btn1 = KeyboardButton(config.KEEPER['GET_ORDERS'])
+        self.markup.row(itm_btn1)
+        return self.markup
+
+    def keeper_orders_menu(self, select_status, next_status):
+        """
+        create inline-buttons menu of orders with selected status
+        :param select_status: status of order to choose from db
+        :param next_status: status to set order if it will be selected
+        :return:
+        """
+        # ToDO: implement inline menu for choose orders to keeper

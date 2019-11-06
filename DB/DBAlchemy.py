@@ -370,6 +370,12 @@ class DBManager(metaclass=Singleton):
         session.close()
         return order_info
 
+    def get_orders_status(self, status=config.Status.New):
+        session = self.__session()
+        order_info = session.query(OrderInfo).filter_by(status=status).all()
+        session.close()
+        return order_info
+
     def get_order_current(self, trader_id):
         session = self.__session()
         order_info = session.query(OrderInfo).filter_by(trader_id=trader_id, is_current=True).first()
