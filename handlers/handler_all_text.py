@@ -317,7 +317,8 @@ class HandlerAllText(Handler):
         """
         user = User(chat_id=message.chat.id, role=config.Role.Keeper)
         self.BD.save_element(user)
-        self.bot.send_message(message.chat.id, 'Приятной работы')
+        self.bot.send_message(message.chat.id, 'Приятной работы',
+                              reply_markup=self.keybords.keeper_menu())
 
     def handle(self):
         """обработчик(декоратор) сообщений,

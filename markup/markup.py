@@ -1,8 +1,9 @@
 # импортируем специальные типы телеграм бота для создания кнопок и клавиатуры
 import json
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from telebot.types import (InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup,
+                           KeyboardButton, ReplyKeyboardRemove)
 # импортируем настройки и утилиты
-from settings import config, utility
+from settings import config
 #  импортируем менеджер для работы с БД
 from DB.DBAlchemy import DBManager
 from models.order_trading import TraderUser
@@ -253,11 +254,27 @@ class Keyboards:
         self.markup.row(itm_btn1)
         return self.markup
 
-    def keeper_orders_menu(self, select_status, next_status):
+    def keeper_orders_menu(self, keeper_user, next_status):
         """
         create inline-buttons menu of orders with selected status
-        :param select_status: status of order to choose from db
+        :param keeper_user:
         :param next_status: status to set order if it will be selected
         :return:
         """
-        # ToDO: implement inline menu for choose orders to keeper
+        orders = keeper_user.get_orders()
+        self.markup = InlineKeyboardMarkup(row_width=1)
+        if len(orders):
+            for order in orders:
+                # dump a data to json string
+                # keys & values are: 'm' - menu: 's' - selected orders with
+                #                    keeper user defined status (choose one order to work with)
+                #                    'k' - keeper id
+                #                    'o' - current order id
+                #                    'n' - next status
+                data = json.dumps({'m': 's',
+                                   'k': keeper_user.chat_id,
+                                   'o': order.id,
+                                   'n': next_status},
+                                  separators=(',', ':'))
+                self.markup.add(self.set_inline_btn(str(order), data))
+            return self.markup

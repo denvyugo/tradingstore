@@ -393,7 +393,7 @@ class Admin:
     def _check_account(self, account):
         """
         if account number is valid then return True, else return False
-        :param bank_account:
+        :param account:
         :return True: if account is valid, False: otherwise
         """
         check_sum = 0

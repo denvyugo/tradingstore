@@ -26,6 +26,9 @@ class HandlerCommands(Handler):
         elif user.role == Role.Admin:
             reply = '{}, здравствуйте! Жду дальнейших задач.'
             markup = self.keybords.admin_menu()
+        elif user.role == Role.Keeper:
+            reply = '{}, здравствуйте! Жду дальнейших задач.'
+            markup = self.keybords.keeper_menu()
         self.bot.send_message(message.chat.id,
                               reply.format(message.from_user.first_name),
                               reply_markup=markup)

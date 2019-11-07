@@ -5,6 +5,8 @@ from handlers.handler_all_text import HandlerAllText
 # импортируем класс HandlerInlineQuery обработка нажатия на кнопки инлайн
 from handlers.handler_inline_query import HandlerInlineQuery
 from handlers.handler_admin import HandlerAdmin
+from handlers.handler_keeper import HandlerKeeper
+
 
 class HandlerMain:
     """
@@ -18,6 +20,7 @@ class HandlerMain:
         self.handler_all_text = HandlerAllText(self.bot)
         self.handler_inline_query = HandlerInlineQuery(self.bot)
         self.handler_admin = HandlerAdmin(self.bot)
+        self.handler_keeper = HandlerKeeper(self.bot)
 
     def handle(self):
         """
@@ -27,3 +30,4 @@ class HandlerMain:
         self.handler_all_text.handle()
         self.handler_inline_query.handle()
         self.handler_admin.handle()
+        self.handler_keeper.handle()

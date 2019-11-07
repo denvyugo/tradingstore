@@ -4,6 +4,7 @@ from handlers.handler import Handler
 # импортируем сообщения пользователю
 from settings.message import MESSAGES
 from models.order_trading import TraderUser
+from models.keeper import Keeper
 
 
 class HandlerInlineQuery(Handler):
@@ -58,7 +59,8 @@ class HandlerInlineQuery(Handler):
     def pressed_btn_client(self, call, code):
         """
         add client to order
-        :param data:
+        :param call:
+        :param code:
         :return:
         """
         trader = TraderUser(code['t'])
@@ -68,6 +70,15 @@ class HandlerInlineQuery(Handler):
         delivery_cost = trader.order.delivery_cost(db=self.BD)
         trader.order.save(db=self.BD)
         self.bot.answer_callback_query(call.id, 'Стоимость доставки {} рублей'.format(delivery_cost))
+
+    def pressed_status_order(self, code):
+        """
+        change status of order by keeper user
+        :param code:
+        :return:
+        """
+        keeper = Keeper(code['k'])
+        keeper.change_status(db=self.BD, order_id=code['o'], order_status=code['n'])
 
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.
@@ -80,3 +91,5 @@ class HandlerInlineQuery(Handler):
                 self.pressed_btn_order(code=code)
             if code['m'] == 'c':
                 self.pressed_btn_client(call=call, code=code)
+            if code['m'] == 's':
+                self.pressed_status_order(code=code)
