@@ -261,7 +261,7 @@ class Keyboards:
         :param next_status: status to set order if it will be selected
         :return:
         """
-        orders = keeper_user.get_orders()
+        orders = keeper_user.get_orders(db=self.BD)
         self.markup = InlineKeyboardMarkup(row_width=1)
         if len(orders):
             for order in orders:

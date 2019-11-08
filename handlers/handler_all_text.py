@@ -333,8 +333,7 @@ class HandlerAllText(Handler):
                 new_user.dialog_status = config.DialogState.UserTrader
                 # self._add_trader(message)
             if message.text == config.KEYBOARD['KEEPER']:
-                # new_user.dialog_status = config.DialogState.UserKeeper
-                pass
+                new_user.dialog_status = config.DialogState.UserKeeper
             if message.text == config.KEYBOARD['ADMIN']:
                 new_user.dialog_status = config.DialogState.UserAdmin
                 # self._add_admin(message)

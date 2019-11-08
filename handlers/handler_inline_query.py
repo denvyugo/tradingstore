@@ -71,7 +71,7 @@ class HandlerInlineQuery(Handler):
         trader.order.save(db=self.BD)
         self.bot.answer_callback_query(call.id, 'Стоимость доставки {} рублей'.format(delivery_cost))
 
-    def pressed_status_order(self, code):
+    def pressed_status_order(self, call, code):
         """
         change status of order by keeper user
         :param code:
@@ -79,6 +79,8 @@ class HandlerInlineQuery(Handler):
         """
         keeper = Keeper(code['k'])
         keeper.change_status(db=self.BD, order_id=code['o'], order_status=code['n'])
+        self.bot.answer_callback_query(call.id,
+                                       'Статус заказа изменён на: {} '.format(code['n']))
 
     def handle(self):
         #обработчик(декоратор) запросов от нажатия на кнопки товара.
@@ -92,4 +94,4 @@ class HandlerInlineQuery(Handler):
             if code['m'] == 'c':
                 self.pressed_btn_client(call=call, code=code)
             if code['m'] == 's':
-                self.pressed_status_order(code=code)
+                self.pressed_status_order(call=call, code=code)

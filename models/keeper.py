@@ -2,7 +2,7 @@
 Models for keeper users
 """
 from DB.DBAlchemy import DBManager
-from models import order_info
+from models.order_info import OrderInfo
 from settings import config
 
 
@@ -43,6 +43,6 @@ class Keeper:
         :param order_status:
         :return:
         """
-        order: order_info.OrderInfo = db.get_order(order_id=order_id)
+        order: OrderInfo = db.get_order_info(order_id=order_id)
         order.status = order_status
         db.save_element(order)
