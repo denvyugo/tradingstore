@@ -25,8 +25,16 @@ def invoices_folder():
 # токен выдается при регистрации приложения, храним в текстовом файле
 def get_token():
     with open(os.path.join(BASE_DIR, 'token.txt'), 'r') as file:
-        token, bot_name = file.readline().split(sep=';')
+        token, _ = file.readline().split(sep=';')
     return token.split(sep=' = ')[1].replace("'", '')
+
+def get_email_config():
+    email_config = {}
+    with open(os.path.join(BASE_DIR, '.env'), 'r') as file:
+        for line in file:
+            key, value = line.split(sep=' = ')
+            email_config[key] = value.replace('\n', '')
+    return email_config
 
 TOKEN = get_token()
 DIALOG = 'settings/dialog'
@@ -139,7 +147,7 @@ class DialogState(IntEnum):
     BankAccountAccount = 9
     BankAccountCorrespondent = 10
     StoreAddress = 11
-    StoreLongitude =12
+    StoreLongitude = 12
     StoreLatitude = 13
     StoreTitle = 14
     StoreDeliveryPrice = 15

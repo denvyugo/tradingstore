@@ -254,27 +254,26 @@ class Keyboards:
         self.markup.row(itm_btn1)
         return self.markup
 
-    def keeper_orders_menu(self, keeper_user, next_status):
+    def keeper_orders_menu(self, keeper_id, orders, next_status):
         """
         create inline-buttons menu of orders with selected status
-        :param keeper_user:
+        :param keeper_id: keeper user's chat id
+        :param orders: list of orders to work
         :param next_status: status to set order if it will be selected
         :return:
         """
-        orders = keeper_user.get_orders(db=self.BD)
         self.markup = InlineKeyboardMarkup(row_width=1)
-        if len(orders):
-            for order in orders:
-                # dump a data to json string
-                # keys & values are: 'm' - menu: 's' - selected orders with
-                #                    keeper user defined status (choose one order to work with)
-                #                    'k' - keeper id
-                #                    'o' - current order id
-                #                    'n' - next status
-                data = json.dumps({'m': 's',
-                                   'k': keeper_user.chat_id,
-                                   'o': order.id,
-                                   'n': next_status},
-                                  separators=(',', ':'))
-                self.markup.add(self.set_inline_btn(str(order), data))
-            return self.markup
+        for order in orders:
+            # dump a data to json string
+            # keys & values are: 'm' - menu: 's' - selected orders with
+            #                    keeper user defined status (choose one order to work with)
+            #                    'k' - keeper id
+            #                    'o' - current order id
+            #                    'n' - next status
+            data = json.dumps({'m': 's',
+                               'k': keeper_id,
+                               'o': order.id,
+                               'n': next_status},
+                              separators=(',', ':'))
+            self.markup.add(self.set_inline_btn(str(order), data))
+        return self.markup

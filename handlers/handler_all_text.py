@@ -186,9 +186,8 @@ class HandlerAllText(Handler):
                                       reply_markup=self.keybords.set_select_client(trader=trader_user))
                 message_text = 'Выбор адресата'
             else:
+                trader_user.order.delivery_cost(db=self.BD)
                 self._perform_order(trader_user)
-                self._perform_invoice(trader_user)
-                self._send_invoice(trader_user.order.id, message.chat.id)
                 message_text = MESSAGES['apply'].format(trader_user.order_items.total_price(self.BD),
                                                         trader_user.order_items.number_items)
         else:
@@ -226,40 +225,6 @@ class HandlerAllText(Handler):
         trader.order.status(status=config.Status.Work)
         trader.order.save(self.BD)
         trader.order_items.current_clear(self.BD)
-
-    def _perform_invoice(self, trader: TraderUser):
-        """
-        perform invoice PDF file in directory invoices
-        :param trader:
-        :return:
-        """
-        if config.is_company_info():
-            info = config.company_info()
-            invoice = ReportInvoice()
-            invoice.company_info(info)
-            client = self.BD.get_client(trader.order.get_client())
-            invoice.set_order(date=trader.order.date, number=trader.order.id,
-                              payer=client.title, address=client.address,
-                              delivery=trader.order.delivery_cost(db=self.BD))
-            for item in trader.order_items:
-                product = self.BD.select_single_product(item.product_id)
-                invoice.add_item(name=product.name, code=product.title, unit='шт.',
-                                 quantity=item.quantity, price=product.price)
-            invoice.make()
-
-    def _send_invoice(self, order_id, chat_id):
-        """
-        send invoice file if it exists
-        :param order_id:
-        :param chat_id:
-        :return:
-        """
-        # check if invoice done
-        file_name = ReportInvoice.invoice_file(order_id)
-        if path.exists(file_name):
-            # send invoice
-            self.bot.send_document(chat_id=chat_id, data=open(file_name, 'rb'))
-
     # -------------------------- end of working with order form ------------------------------------
 
     def _get_trader_orders(self, message):

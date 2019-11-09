@@ -19,7 +19,13 @@ class HandlerKeeper(Handler):
             """
             keeper_user = Keeper(chat_id=message.chat.id)
             keeper_user.order_status = Status.Work
-            reply = 'Выберите собранный заказ'
-            markup = self.keybords.keeper_orders_menu(keeper_user=keeper_user,
-                                                      next_status=Status.Done)
+            orders = keeper_user.get_orders(db=self.BD)
+            if orders:
+                reply = 'Выберите собранный заказ'
+                markup = self.keybords.keeper_orders_menu(keeper_id=keeper_user.chat_id,
+                                                          orders=orders,
+                                                          next_status=Status.Complete)
+            else:
+                reply = 'У Вас нет заказов в работе'
+                markup = None
             self.bot.send_message(keeper_user.chat_id, reply, reply_markup=markup)

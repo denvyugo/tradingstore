@@ -74,11 +74,13 @@ class HandlerInlineQuery(Handler):
     def pressed_status_order(self, call, code):
         """
         change status of order by keeper user
+        :param call:
         :param code:
         :return:
         """
         keeper = Keeper(code['k'])
         keeper.change_status(db=self.BD, order_id=code['o'], order_status=code['n'])
+        keeper.perform_invoice(db=self.BD, order_id=code['o'])
         self.bot.answer_callback_query(call.id,
                                        'Статус заказа изменён на: {} '.format(code['n']))
 

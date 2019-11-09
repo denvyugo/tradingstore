@@ -1,6 +1,6 @@
 # импортируем настройки и утилиты
 from settings.config import (ADMINISTRATIVE, DialogState, dialog_state_name,
-                             is_company_info, company_info)
+                             is_company_info, company_info, Role)
 # импортируем ответ пользователю
 from settings.message import MESSAGES
 # импортируем класс родитель
@@ -283,8 +283,10 @@ class HandlerAdmin(Handler):
             :param chat_id:
             :return dialog_status:
             """
-            admin = Admin(chat_id=chat_id)
-            return admin.dialog_status
+            user = self.BD.get_user(chat_id=chat_id)
+            if user.role == Role.Admin:
+                admin = Admin(chat_id=chat_id)
+                return admin.dialog_status
 
         def _change_dialog_state(admin, state):
             admin.dialog_status = state
