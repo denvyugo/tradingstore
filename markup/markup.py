@@ -114,9 +114,9 @@ class Keyboards:
         markup for role selection
         """
         self.markup = ReplyKeyboardMarkup(True, True, row_width=1)
-        itm_btn_1 = self.set_btn('TRADER')
-        itm_btn_2 = self.set_btn('KEEPER')
-        itm_btn_3 = self.set_btn('ADMIN')
+        itm_btn_1 = KeyboardButton(config.DEFAULT['TRADER'])
+        itm_btn_2 = KeyboardButton(config.DEFAULT['KEEPER'])
+        itm_btn_3 = KeyboardButton(config.DEFAULT['ADMIN'])
         self.markup.row(itm_btn_1, itm_btn_2, itm_btn_3)
         return self.markup
 
