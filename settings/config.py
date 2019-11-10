@@ -78,7 +78,10 @@ KEYBOARD = {
     'AMOUNT_ORDERS': COUNT,
     'UP': emojize('🔼'),
     'APPLY': '✅ Оформить заказ',
-    'COPY': '©️',
+    'COPY': '©️'
+}
+# Keyboard for default user (get role)
+DEFAULT = {
     'TRADER': 'Trader',
     'KEEPER': 'Keeper',
     'ADMIN': 'Admin'

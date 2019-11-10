@@ -1,5 +1,4 @@
 import json
-from os import path
 # импортируем настройки и утилиты
 from settings import config
 # импортируем ответ пользователю
@@ -9,7 +8,6 @@ from handlers.handler import Handler
 from models.default_user import DefaultUser
 from models.user import User
 from models.order_trading import TraderUser
-from reports.reports import ReportInvoice
 
 
 class HandlerAllText(Handler):
@@ -291,19 +289,6 @@ class HandlerAllText(Handler):
         """
         @self.bot.message_handler(func=lambda message: message.text in config.KEYBOARD.values())
         def handle(message):
-            # ********** меню (выбор роли)                          **********
-            new_user = DefaultUser(chat_id=message.chat.id)
-            reply = 'Введите пароль'
-            if message.text == config.KEYBOARD['TRADER']:
-                new_user.dialog_status = config.DialogState.UserTrader
-                # self._add_trader(message)
-            if message.text == config.KEYBOARD['KEEPER']:
-                new_user.dialog_status = config.DialogState.UserKeeper
-            if message.text == config.KEYBOARD['ADMIN']:
-                new_user.dialog_status = config.DialogState.UserAdmin
-                # self._add_admin(message)
-            self.bot.send_message(message.chat.id, reply)
-
             # ********** меню (выбор категории, настройки, сведения)**********
             if message.text == config.KEYBOARD['CHOOSE_ORDER']:
                 self._get_trader_orders(message)
@@ -340,7 +325,6 @@ class HandlerAllText(Handler):
                 self.pressed_btn_back(message)
 
             # ********** меню (Заказа)**********
-
             if message.text == config.KEYBOARD['BACK_STEP']:
                 self.pressed_btn_back_step(message)
 
@@ -363,6 +347,27 @@ class HandlerAllText(Handler):
             #     self.bot.send_message(message.chat.id, message.text)
 
         # ********** input password **********
+        @self.bot.message_handler(func=lambda message: message.text in config.DEFAULT.values())
+        def _input_password(message):
+            """
+            input password depends on choose role
+            :param message:
+            :return:
+            """
+            # ********** меню (выбор роли)                          **********
+            new_user = DefaultUser(chat_id=message.chat.id)
+            reply = 'Введите пароль'
+            if message.text == config.KEYBOARD['TRADER']:
+                new_user.dialog_status = config.DialogState.UserTrader
+                # self._add_trader(message)
+            if message.text == config.KEYBOARD['KEEPER']:
+                new_user.dialog_status = config.DialogState.UserKeeper
+            if message.text == config.KEYBOARD['ADMIN']:
+                new_user.dialog_status = config.DialogState.UserAdmin
+                # self._add_admin(message)
+            self.bot.send_message(message.chat.id, reply)
+
+        # ********** check password **********
         @self.bot.message_handler(func=lambda message: _dialog_password(message.chat.id))
         def _check_password(message):
             """
