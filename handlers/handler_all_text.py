@@ -357,12 +357,12 @@ class HandlerAllText(Handler):
             # ********** меню (выбор роли)                          **********
             new_user = DefaultUser(chat_id=message.chat.id)
             reply = 'Введите пароль'
-            if message.text == config.KEYBOARD['TRADER']:
+            if message.text == config.DEFAULT['TRADER']:
                 new_user.dialog_status = config.DialogState.UserTrader
                 # self._add_trader(message)
-            if message.text == config.KEYBOARD['KEEPER']:
+            if message.text == config.DEFAULT['KEEPER']:
                 new_user.dialog_status = config.DialogState.UserKeeper
-            if message.text == config.KEYBOARD['ADMIN']:
+            if message.text == config.DEFAULT['ADMIN']:
                 new_user.dialog_status = config.DialogState.UserAdmin
                 # self._add_admin(message)
             self.bot.send_message(message.chat.id, reply)
