@@ -179,10 +179,12 @@ class HandlerAllText(Handler):
         if trader_user.order_items.number_positions > 0:
             # отправляем ответ пользователю
             if not trader_user.order.has_client():
+                # check clients in db, if not then set test data
+                self.BD.check_clients()
                 self.bot.send_message(message.chat.id,
                                       'Укажите адресата доставки заказа:',
                                       reply_markup=self.keybords.set_select_client(trader=trader_user))
-                message_text = 'Выбор адресата'
+                message_text = 'Выберите клиента из списка выше и повторно нажмите оформить заказ.'
             else:
                 trader_user.order.delivery_cost(db=self.BD)
                 self._perform_order(trader_user)

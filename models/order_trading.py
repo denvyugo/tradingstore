@@ -269,7 +269,6 @@ class OrderSpec:
         :param db: get addresses of stores
         :return delivery_cost: cost is distance multiply to price_km of nearest store to client
         """
-        print('DELIVERY COST:', self._delivery_cost)
         if self._delivery_cost is None or self._delivery_cost == 0:
             if self._client == 0:
                 return 0
@@ -282,7 +281,6 @@ class OrderSpec:
 
     def status(self, status):
         if status != 0:
-            print('STATUS:', status)
             self._current = False
         self._status = status
 
