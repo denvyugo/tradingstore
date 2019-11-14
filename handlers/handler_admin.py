@@ -284,9 +284,10 @@ class HandlerAdmin(Handler):
             :return dialog_status:
             """
             user = self.BD.get_user(chat_id=chat_id)
-            if user.role == Role.Admin:
-                admin = Admin(chat_id=chat_id)
-                return admin.dialog_status
+            if not user is None:
+                if user.role == Role.Admin:
+                    admin = Admin(chat_id=chat_id)
+                    return admin.dialog_status
 
         def _change_dialog_state(admin, state):
             admin.dialog_status = state

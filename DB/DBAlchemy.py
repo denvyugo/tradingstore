@@ -20,7 +20,7 @@ from models.user import User
 
 class Singleton(type):
     """
-    Патерн Singleton предоставляет механизм создания одного и только один экземпляра объекта, 
+    Патерн Singleton предоставляет механизм создания одного и только один экземпляра объекта,
     и предоставление к нему глобальную точку доступа.
     """
     def __init__(cls, name, bases, attrs, **kwargs):
@@ -34,13 +34,13 @@ class Singleton(type):
 
 
 class DBManager(metaclass=Singleton):
-    """ 
-    Класс менеджер для работы с БД 
+    """
+    Класс менеджер для работы с БД
     """
 
     def __init__(self):
-        """ 
-        Инициализация сесии и подключения к БД 
+        """
+        Инициализация сесии и подключения к БД
         """
         self.engine = create_engine(config.DATABASE)
         self.__session = sessionmaker(bind=self.engine)
@@ -50,8 +50,8 @@ class DBManager(metaclass=Singleton):
             self._set_tabs()
 
     def _set_tabs(self):
-        """ 
-        Метод заполнения полей таблицы Тест 
+        """
+        Метод заполнения полей таблицы Тест
         """
         category_1 = Category(name='Полуфабрикаты', is_active=True)
         category_2 = Category(name='Бакалея', is_active=True)
@@ -80,12 +80,12 @@ class DBManager(metaclass=Singleton):
     def _set_client(self, session):
         email_config = config.get_email_config()
         client = Client(address='Москва', chat_id=0, email=email_config['SENDER_EMAIL'],
-                        latitude=55.743511, longitude=37.490200, phone='',
+                        latitude=55.899121, longitude=37.426408, phone='',
                         title='ИП Иванов А.И.', user_name='ivan_ai')
         session.add(client)
 
     def _set_store(self, session):
-        store = Store(address='Москва, Химки', latitude=55.892811, longitude=37.448085,
+        store = Store(address='Москва, Химки', latitude=55.906430, longitude=37.459161,
                       price_km=50.0, title='Склад №1')
         session.add(store)
 
@@ -99,8 +99,8 @@ class DBManager(metaclass=Singleton):
             session.close()
 
     def select_single_product(self, rownum):
-        """ 
-        Возвращает одну строку товара с номером rownum 
+        """
+        Возвращает одну строку товара с номером rownum
         """
         session=self.__session()
         result = session.query(Products).filter_by(id=rownum).first()
@@ -108,8 +108,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def select_single_product_name(self, rownum):
-        """ 
-        Возвращает название товара в соответствии с номером rownum 
+        """
+        Возвращает название товара в соответствии с номером rownum
         """
         session = self.__session()
         result = session.query(Products.name).filter_by(id=rownum).first()
@@ -117,8 +117,8 @@ class DBManager(metaclass=Singleton):
         return result.name
 
     def select_single_product_quantity(self, rownum):
-        """ 
-        Возвращает количество товара в соответствии с номером rownum 
+        """
+        Возвращает количество товара в соответствии с номером rownum
         """
         session = self.__session()
         result = session.query(
@@ -127,8 +127,8 @@ class DBManager(metaclass=Singleton):
         return result.quantity
 
     def select_single_product_title(self, rownum):
-        """ 
-        Возвращает title товара в соответствии с номером rownum 
+        """
+        Возвращает title товара в соответствии с номером rownum
         """
         session = self.__session()
         result = session.query(Products.title).filter_by(id=rownum).one()
@@ -136,8 +136,8 @@ class DBManager(metaclass=Singleton):
         return result.title
 
     def select_single_product_price(self, rownum):
-        """ 
-        Возвращает price товара в соответствии с номером rownum 
+        """
+        Возвращает price товара в соответствии с номером rownum
         """
         session = self.__session()
         result = session.query(Products.price).filter_by(id=rownum).one()
@@ -145,7 +145,7 @@ class DBManager(metaclass=Singleton):
         return result.price
 
     def select_all_products(self):
-        """ 
+        """
         Возвращает все строки товаров
         """
         session = self.__session()
@@ -154,8 +154,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def select_all_products_category(self, category):
-        """ 
-        Возвращает все строки товара категории 
+        """
+        Возвращает все строки товара категории
         """
         session = self.__session()
         result = session.query(Products).filter_by(
@@ -164,8 +164,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def select_all_id_category(self):
-        """ 
-        Возвращает все строки товара категории 
+        """
+        Возвращает все строки товара категории
         """
         session = self.__session()
         result = session.query(Category.id).all()
@@ -173,8 +173,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def select_count_products_category(self, category):
-        """ 
-        Возвращает количество всех строк товара категории 
+        """
+        Возвращает количество всех строк товара категории
         """
         session = self.__session()
         result = session.query(Products).filter_by(
@@ -183,7 +183,7 @@ class DBManager(metaclass=Singleton):
         return result
 
     def count_rows_products(self):
-        """ 
+        """
         Возвращает количество строк товара
         """
         session = self.__session()
@@ -192,8 +192,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def update_product_value(self, rownum, name, value):
-        """ 
-        Обновляет данные указанной строки товара 
+        """
+        Обновляет данные указанной строки товара
         """
         session = self.__session()
         session.query(Products).filter_by(
@@ -202,8 +202,8 @@ class DBManager(metaclass=Singleton):
         session.close()
 
     def delete_product(self, rownum):
-        """ 
-        Удаляет данные указанной строки товара 
+        """
+        Удаляет данные указанной строки товара
         """
         session = self.__session()
         session.query(Products).filter_by(id=rownum).delete()
@@ -239,7 +239,7 @@ class DBManager(metaclass=Singleton):
         session.add(order)
         session.commit()
         session.close()
-        
+
     def decrease_product(self, product_id, quantity):
         """
         check if quantity enough and decrease quantity of product
@@ -277,7 +277,7 @@ class DBManager(metaclass=Singleton):
             return False
 
     def select_all_product_id(self):
-        """ 
+        """
         Возвращает все id товара в заказе
         """
         session = self.__session()
@@ -302,8 +302,8 @@ class DBManager(metaclass=Singleton):
         return result
 
     def update_order_value(self, product_id, name, value):
-        """ 
-        Обновляет данные указанной строки заказа 
+        """
+        Обновляет данные указанной строки заказа
         """
         session = self.__session()
         self._session.query(Order).filter_by(
@@ -312,8 +312,8 @@ class DBManager(metaclass=Singleton):
         session.close()
 
     def delete_all_order(self):
-        """ 
-        Удаляет данные всего заказа 
+        """
+        Удаляет данные всего заказа
         """
         session = self.__session()
         all_id_orders = self.select_all_order_id()
@@ -324,8 +324,8 @@ class DBManager(metaclass=Singleton):
         session.close()
 
     def delete_order(self, product_id):
-        """ 
-        Удаляет данные указанной строки заказа 
+        """
+        Удаляет данные указанной строки заказа
         """
         session = self.__session()
         session.query(Order).filter_by(product_id=product_id).delete()
@@ -333,8 +333,8 @@ class DBManager(metaclass=Singleton):
         session.close()
 
     def select_order_quantity(self, product_id):
-        """ 
-        Возвращает количество товара в соответствии с номером rownum 
+        """
+        Возвращает количество товара в соответствии с номером rownum
         """
         session = self.__session()
         result = session.query(Order.quantity).filter_by(
@@ -343,7 +343,7 @@ class DBManager(metaclass=Singleton):
         return result.quantity
 
     def count_rows_order(self):
-        """  
+        """
         Возвращает количество строк заказа
         """
         session = self.__session()
@@ -352,7 +352,7 @@ class DBManager(metaclass=Singleton):
         return result
 
     def select_all_order_id(self):
-        """ 
+        """
         Возвращает все id заказа
         """
         session = self.__session()
@@ -361,8 +361,8 @@ class DBManager(metaclass=Singleton):
         return utility._convert(result)
 
     def select_single_order_id(self, rownum):
-        """ 
-        Возвращает id заказа с номером rownum 
+        """
+        Возвращает id заказа с номером rownum
         """
         session = self.__session()
         result = session.query(Order.id).filter_by(id=rownum).one()

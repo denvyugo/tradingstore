@@ -37,8 +37,8 @@ def get_email_config():
     return email_config
 
 TOKEN = get_token()
-DIALOG = 'settings/dialog'
-COMPANY_INFO = 'settings/company.json'
+DIALOG = os.path.join(BASE_DIR, 'dialog')
+COMPANY_INFO = os.path.join(BASE_DIR, 'company.json')
 
 def is_company_info():
     """

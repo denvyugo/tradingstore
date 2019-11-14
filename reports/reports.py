@@ -43,7 +43,7 @@ class ReportInvoice:
         """
         base_folder = config.invoices_folder()
         invoice_file = 'invoice{:06}.pdf'.format(number)
-        return config.os.path.join(base_folder,invoice_file)
+        return config.os.path.join(base_folder, invoice_file)
 
     def set_order(self, date, number, payer, address, delivery):
         self._order.date = date

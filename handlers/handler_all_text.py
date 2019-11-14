@@ -69,56 +69,59 @@ class HandlerAllText(Handler):
         обрабатывает входящие текстовые сообщения от нажатия на кнопку order - start work with it
         """
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        if trader_user.order_items.number_positions > 0:
-            # current order has a order positions
-            # get current order item, set current first if there is no current order
-            order_item = trader_user.order_items.current_get(db=self.BD)
-            # send the message - fill the form
-            self.send_message_order(message, order_item, trader_user)
-        else:
-            # current order has not a positions
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            if trader_user.order_items.number_positions > 0:
+                # current order has a order positions
+                # get current order item, set current first if there is no current order
+                order_item = trader_user.order_items.current_get(db=self.BD)
+                # send the message - fill the form
+                self.send_message_order(message, order_item, trader_user)
+            else:
+                # current order has not a positions
+                self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                      parse_mode="HTML",
+                                      reply_markup=self.keybords.category_menu())
 
     def pressed_btn_back_step(self, message):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопку back_step.
         """
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        if trader_user.order_items.number_positions > 0:
-            # current order has a order positions
-            # get previous order item
-            order_item = trader_user.order_items.current_prev(db=self.BD)
-            # send the message - fill the form
-            if not order_item is None:
-                self.send_message_order(message, order_item, trader_user)
-        else:
-            # current order has not a positions
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            if trader_user.order_items.number_positions > 0:
+                # current order has a order positions
+                # get previous order item
+                order_item = trader_user.order_items.current_prev(db=self.BD)
+                # send the message - fill the form
+                if not order_item is None:
+                    self.send_message_order(message, order_item, trader_user)
+            else:
+                # current order has not a positions
+                self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                      parse_mode="HTML",
+                                      reply_markup=self.keybords.category_menu())
 
     def pressed_btn_next_step(self, message):
         """
         обрабатывает входящие текстовые сообщения от нажатия на кнопку next_step.
         """
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        if trader_user.order_items.number_positions > 0:
-            # current order has a order positions
-            # get next order item
-            order_item = trader_user.order_items.current_next(db=self.BD)
-            # send the message - fill the form
-            if not order_item is None:
-                self.send_message_order(message, order_item, trader_user)
-        else:
-            # current order has not a positions
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            if trader_user.order_items.number_positions > 0:
+                # current order has a order positions
+                # get next order item
+                order_item = trader_user.order_items.current_next(db=self.BD)
+                # send the message - fill the form
+                if not order_item is None:
+                    self.send_message_order(message, order_item, trader_user)
+            else:
+                # current order has not a positions
+                self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                      parse_mode="HTML",
+                                      reply_markup=self.keybords.category_menu())
 
     def pressed_btn_down(self, message):
         """
@@ -126,12 +129,14 @@ class HandlerAllText(Handler):
         """
         # получаем список всех товаров в заказе
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        # получаем количество конкретной позиции в заказе
-        order_item = trader_user.order_items.current_get(db=self.BD)
-        trader_user.dec_item(db=self.BD, product_id=order_item.product_id)
-        # отправляем ответ пользователю
-        self.send_message_order(message, order_item, trader_user)
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            # получаем количество конкретной позиции в заказе
+            if trader_user.order_items.number_positions:
+                order_item = trader_user.order_items.current_get(db=self.BD)
+                trader_user.dec_item(db=self.BD, product_id=order_item.product_id)
+                # отправляем ответ пользователю
+                self.send_message_order(message, order_item, trader_user)
 
     def pressed_btn_up(self, message):
         """
@@ -139,12 +144,15 @@ class HandlerAllText(Handler):
         """
         # получаем список всех товаров в заказе
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        # получаем количество конкретной позиции в заказе
-        order_item = trader_user.order_items.current_get(db=self.BD)
-        trader_user.add_item(db=self.BD, product_id=order_item.product_id)
-        # отправляем ответ пользователю
-        self.send_message_order(message, order_item, trader_user)
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            number_items = trader_user.order_items.number_items
+            if number_items > 0:
+                # получаем количество конкретной позиции в заказе
+                order_item = trader_user.order_items.current_get(db=self.BD)
+                trader_user.add_item(db=self.BD, product_id=order_item.product_id)
+                # отправляем ответ пользователю
+                self.send_message_order(message, order_item, trader_user)
 
     def pressed_btn_x(self, message):
         """
@@ -153,21 +161,24 @@ class HandlerAllText(Handler):
         # получаем список всех product_id заказа
         # count = self.BD.select_all_product_id()
         trader_user = self._get_current_trader(message)
-        trader_user.load_current(db=self.BD)
-        # если список не пуст
-        order_item = trader_user.order_items.current_get(db=self.BD)
-        trader_user.del_item(db=self.BD, product_id=order_item.product_id)
-        # если список не пуст
-        if trader_user.order_items.number_positions > 0:
-            # отправляем пользователю сообщение
-            order_item = trader_user.order_items.current_get(db=self.BD)
-            # send the message - fill the form
-            self.send_message_order(message, order_item, trader_user)
-        else:
-            # если товара нет в заказе отправляем сообщение
-            self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
-                                  parse_mode="HTML",
-                                  reply_markup=self.keybords.category_menu())
+        if not trader_user is None:
+            trader_user.load_current(db=self.BD)
+            # если список не пуст
+            number_items = trader_user.order_items.number_items
+            if number_items > 0:
+                order_item = trader_user.order_items.current_get(db=self.BD)
+                trader_user.del_item(db=self.BD, product_id=order_item.product_id)
+                # если список не пуст
+                if trader_user.order_items.number_positions > 0:
+                    # отправляем пользователю сообщение
+                    order_item = trader_user.order_items.current_get(db=self.BD)
+                    # send the message - fill the form
+                    self.send_message_order(message, order_item, trader_user)
+                else:
+                    # если товара нет в заказе отправляем сообщение
+                    self.bot.send_message(message.chat.id, MESSAGES['no_orders'],
+                                          parse_mode="HTML",
+                                          reply_markup=self.keybords.category_menu())
 
     def pressed_btn_apply(self, message):
         """
@@ -213,7 +224,7 @@ class HandlerAllText(Handler):
                                                        product.title,
                                                        product.price,
                                                        order_item.quantity),
-                              parse_mode="HTML",                                          
+                              parse_mode="HTML",
                               reply_markup=self.keybords.orders_menu(step=json.dumps(step)))
 
     def _perform_order(self, trader: TraderUser):
@@ -261,7 +272,8 @@ class HandlerAllText(Handler):
         :return: TraderUser
         """
         user = self.BD.get_user(chat_id=message.chat.id)
-        return TraderUser(user.id, message.from_user.first_name)
+        if not user is None:
+            return TraderUser(user.id, message.from_user.first_name)
 
     def _add_admin(self, message):
         """
